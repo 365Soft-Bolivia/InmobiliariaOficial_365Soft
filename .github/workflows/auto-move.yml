@@ -9,8 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Move linked issue to 'In Review'
-        uses: peter-evans/project-actions@v2
+        uses: peter-evans/create-or-update-project-card@v3
         with:
-          project: 'InnmobiliariaOficial_365Soft'
-          column: 'In review'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ORG_PAT }}
+          project-location: organization
+          project-name: 'InnmobiliariaOficial_365Soft'
+          column-name: 'In Review'
+          issue-number: ${{ github.event.pull_request.number }}
