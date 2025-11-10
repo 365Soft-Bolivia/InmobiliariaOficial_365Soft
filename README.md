@@ -112,6 +112,11 @@ Este comando creará las siguientes tablas:
 - `users`: Usuarios del sistema
 - Tablas de autenticación (sessions, password_reset_tokens, etc.)
 
+
+IMPORTANTE 
+```bash
+php artisan storage:link
+```
 ### 6. Instalar Dependencias de Node
 
 ```bash
