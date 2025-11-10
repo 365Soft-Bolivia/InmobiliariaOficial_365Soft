@@ -25,13 +25,13 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        // Verificar que el usuario tenga un rol asignado
-        if (!$user->role) {
+        // CORRECCIÓN: Usar la relación 'roles' (plural) y obtener el primer rol
+        if (!$user->roles || $user->roles->isEmpty()) {
             abort(403, 'Usuario sin rol asignado. Contacta al administrador.');
         }
 
-        // Verificar que el rol coincida con alguno de los permitidos
-        $userRoleName = $user->role->nombre; // Usar 'nombre' en lugar de 'name'
+        // CORRECCIÓN: Obtener el nombre del primer rol
+        $userRoleName = $user->roles->first()->name;
         
         if (!in_array($userRoleName, $roles)) {
             abort(403, 'No tienes permiso para acceder a esta página.');
