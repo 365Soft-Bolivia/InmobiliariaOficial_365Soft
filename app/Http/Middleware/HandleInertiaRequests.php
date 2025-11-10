@@ -28,12 +28,13 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
-                    // Agregar el rol del usuario
-                    'role' => $request->user()->role ? [
-                        'id' => $request->user()->role->id,
-                        'nombre' => $request->user()->role->nombre,
-                        'name' => $request->user()->role->nombre, // Para compatibilidad
-                    ] : null,
+                    'roles' => $request->user()->roles->map(function ($role) { // ✅ PLURAL
+                        return [
+                            'id' => $role->id,
+                            'name' => $role->name,
+                            'display_name' => $role->display_name,
+                        ];
+                    })->toArray(),
                 ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

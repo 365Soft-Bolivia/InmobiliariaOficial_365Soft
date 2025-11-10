@@ -3,22 +3,22 @@
 import type { Component } from 'vue';
 import type { LucideIcon } from 'lucide-vue-next';
 
+// Rol del usuario
+export interface UserRole {
+    id: number;
+    name: string;
+    display_name?: string; // Cambié 'nombre' por 'name' para consistencia
+    description?: string;
+    active?: boolean;
+}
+
 // Usuario
 export interface User {
     id: number;
     name: string;
     email: string;
     email_verified_at?: string | null;
-    role?: UserRole | null;
-}
-
-// Rol del usuario
-export interface UserRole {
-    id: number;
-    nombre: string;
-    name: string;
-    descripcion?: string;
-    activo?: boolean;
+    roles: UserRole[]; // Cambiado a array de UserRole
 }
 
 // Autenticación
@@ -42,7 +42,7 @@ export interface PageProps {
 export interface NavItem {
     title: string;
     href: string;
-    icon: LucideIcon | Component; // Cambiado para aceptar LucideIcon
+    icon: LucideIcon | Component;
     roles?: string[];
     badge?: string | number;
     isActive?: boolean;
