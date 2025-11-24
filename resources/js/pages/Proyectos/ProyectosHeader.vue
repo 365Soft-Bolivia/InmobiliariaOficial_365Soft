@@ -3,7 +3,9 @@ import { ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import ProyectosCreateForm from './ProyectosCreateForm.vue';
-import products from '@/routes/products';
+import { admin } from '@/routes-custom';
+
+const { proyectos } = admin;
 
 interface Category {
   id: number;
@@ -22,9 +24,9 @@ const search = ref(props.filters?.search || '');
 
 // Búsqueda con debounce
 const debouncedSearch = useDebounceFn(() => {
-  router.get('/proyectos', 
+  router.get(proyectos.index().url,
     { search: search.value },
-    { 
+    {
       preserveState: true,
       preserveScroll: true,
       replace: true
@@ -43,11 +45,11 @@ const handleProductCreated = () => {
 
 //Función para ir a la página de detalles
 const verDetalles = (proyectoId: number) => {
-  router.visit(`/proyectos/${proyectoId}`);
+  router.visit(proyectos.show(proyectoId).url);
 };
 
 const goToDetalles = (id: number) => {
-  router.visit(`/proyectos/${id}`);
+  router.visit(proyectos.show(id).url);
 };
 
 </script>

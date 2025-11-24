@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
 
 test('login screen can be rendered', function () {
-    $response = $this->get(route('login'));
+    $response = $this->get(route('admin.login'));
 
     $response->assertStatus(200);
 });
@@ -40,7 +40,7 @@ test('users with two factor enabled are redirected to two factor challenge', fun
         'two_factor_confirmed_at' => now(),
     ])->save();
 
-    $response = $this->post(route('login'), [
+    $response = $this->post(route('admin.login'), [
         'email' => $user->email,
         'password' => 'password',
     ]);

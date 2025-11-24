@@ -11,7 +11,7 @@ test('two factor challenge redirects to login when not authenticated', function 
 
     $response = $this->get(route('two-factor.login'));
 
-    $response->assertRedirect(route('login'));
+    $response->assertRedirect(route('admin.login'));
 });
 
 test('two factor challenge can be rendered', function () {
@@ -32,7 +32,7 @@ test('two factor challenge can be rendered', function () {
         'two_factor_confirmed_at' => now(),
     ])->save();
 
-    $this->post(route('login'), [
+    $this->post(route('admin.login'), [
         'email' => $user->email,
         'password' => 'password',
     ]);

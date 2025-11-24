@@ -1,6 +1,8 @@
 import { Folder, MapPinned, Tag, LockKeyhole } from 'lucide-vue-next';
-import { dashboard, proyectos,  categorias, accesos, ubicaciones } from '@/routes';
+import { admin } from '@/routes-custom';
 import type { NavItem } from '@/types';
+
+const { dashboard, proyectos, categorias, accesos, ubicaciones } = admin;
 
 export const allMainNavItems: NavItem[] = [
   {
@@ -10,7 +12,7 @@ export const allMainNavItems: NavItem[] = [
   },
   {
     title: 'Proyectos',
-    href: proyectos().url,
+    href: proyectos.index().url,
     icon: Folder,
     roles: ['admin'],
   },

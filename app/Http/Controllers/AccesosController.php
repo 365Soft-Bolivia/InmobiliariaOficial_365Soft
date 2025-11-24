@@ -69,52 +69,57 @@ class AccesosController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
-        try {
-            \Log::info(' Datos recibidos para crear usuario:', $request->all());
+  public function store(Request $request)
+{
+    try {
+        \Log::info(' Datos recibidos para crear usuario:', $request->all());
 
-            $validated = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'password' => ['required', 'confirmed', Rules\Password::defaults()],
-                'role_id' => ['required', 'exists:roles,id'],
-                'company_id' => ['nullable', 'integer', 'exists:companies,id'],
-                'gender' => ['nullable', 'in:male,female,other'],
-            ]);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role_id' => ['required', 'exists:roles,id'],
+            'company_id' => ['nullable', 'integer', 'exists:companies,id'],
+            'gender' => ['nullable', 'in:male,female,other'],
+        ]);
 
-            \Log::info(' Validación exitosa:', $validated);
+        \Log::info(' Validación exitosa:', $validated);
 
-            $user = new User();
-            $user->name = $validated['name'];
-            $user->email = $validated['email'];
-            $user->password = Hash::make($validated['password']);
-            $user->status = 'active'; //  Correcto según tu ENUM
-            $user->company_id = $validated['company_id'] ?? 1;
-            $user->dark_theme = 0;
-            $user->rtl = 0;
-            $user->email_notifications = 1;
-            $user->gender = $validated['gender'] ?? 'male';
-            $user->locale = 'es';
-            $user->login = 'enable';
-            $user->save();
+        $user = new User();
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->password = Hash::make($validated['password']);
+        $user->status = 'active';
+        $user->company_id = $validated['company_id'] ?? 1;
+        $user->dark_theme = 0;
+        $user->rtl = 0;
+        $user->email_notifications = 1;
+        $user->gender = $validated['gender'] ?? 'male';
+        $user->locale = 'es';
+        $user->login = 'enable';
+        $user->save();
 
-            \Log::info('Usuario creado con ID: ' . $user->id);
+        \Log::info('Usuario creado con ID: ' . $user->id);
 
-            $user->roles()->attach($validated['role_id']);
+        $user->roles()->attach($validated['role_id']);
 
-            \Log::info(' Rol asignado correctamente');
+        \Log::info('Rol asignado correctamente');
 
-            return redirect()->route('accesos')->with('success', 'Usuario creado correctamente.');
-        } catch (\Exception $e) {
-            \Log::error(' Error al crear usuario:', [
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-            ]);
-            return back()->with('error', 'Error al crear el usuario: ' . $e->getMessage())->withInput();
-        }
+        return redirect()->route('admin.accesos')->with('success', 'Usuario creado correctamente.');
+
+    } catch (\Exception $e) {
+
+        \Log::error(' Error al crear usuario:', [
+            'message' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+        ]);
+
+        return back()->with('error', 'Error al crear el usuario: ' . $e->getMessage())
+                     ->withInput();
     }
+}
+
     public function update(Request $request, int $id)
     {
         try {

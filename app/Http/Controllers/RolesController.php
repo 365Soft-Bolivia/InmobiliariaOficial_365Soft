@@ -62,7 +62,7 @@ class RolesController extends Controller
         $role->status = ($validated['activo'] ?? true) ? 'enabled' : 'disabled';
         $role->save();
 
-        return redirect()->route('roles')->with('success', 'Rol creado correctamente.');
+        return redirect()->route('admin.roles')->with('success', 'Rol creado correctamente.');
     }
 
     public function update(Request $request, int $id)

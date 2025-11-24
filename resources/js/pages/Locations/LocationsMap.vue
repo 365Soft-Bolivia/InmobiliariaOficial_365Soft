@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { ubicaciones } from '@/routes';
+import { admin } from '@/routes-custom';
+
+const { ubicaciones } = admin;
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { onMounted, ref, onUnmounted, computed } from 'vue';

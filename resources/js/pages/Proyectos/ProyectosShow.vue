@@ -5,6 +5,9 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import ProyectosImageUploader from './ProyectosImageUploader.vue';
 import ProyectosImageGallery from './ProyectosImageGallery.vue';
+import { admin } from '@/routes-custom';
+
+const { proyectos } = admin;
 
 interface Category {
   id: number;
@@ -52,8 +55,8 @@ const props = defineProps<{
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-  { title: 'Proyectos', href: '/proyectos' },
-  { title: props.producto.name, href: `/proyectos/${props.producto.id}` },
+  { title: 'Proyectos', href: proyectos.index().url },
+  { title: props.producto.name, href: proyectos.show(props.producto.id).url },
 ];
 
 const currentTab = ref<'imagenes' | 'general' | 'detalles' | 'otros'>('imagenes');

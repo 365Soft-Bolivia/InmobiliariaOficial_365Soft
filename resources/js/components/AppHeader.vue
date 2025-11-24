@@ -36,7 +36,9 @@ import { useAuth } from '@/composables/useAuth';
 import { getInitials } from '@/composables/useInitials';
 import UserMenuContent from '@/components/UserMenuContent.vue';
 import type { BreadcrumbItem } from '@/types';
-import { dashboard } from '@/routes';
+import { admin } from '@/routes-custom';
+
+const { dashboard } = admin;
 
 interface Props {
   breadcrumbs?: BreadcrumbItem[];

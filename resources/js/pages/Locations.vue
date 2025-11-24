@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { ubicaciones } from '@/routes';
+import { admin } from '@/routes-custom';
+
+const { ubicaciones } = admin;
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { MapPin, Plus, Edit3 } from 'lucide-vue-next';
@@ -35,7 +37,7 @@ const navigateTo = (route: string) => {
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <!-- Botón: Ver Mapa -->
                     <button
-                        @click="navigateTo('/ubicaciones/mapa')"
+                        @click="navigateTo(ubicaciones.mapa().url)"
                         class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-8 text-white shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105"
                     >
                         <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
@@ -63,7 +65,7 @@ const navigateTo = (route: string) => {
 
                     <!-- Botón: Asignar Ubicación -->
                     <button
-                        @click="navigateTo('/ubicaciones/asignar')"
+                        @click="navigateTo(ubicaciones.asignar().url)"
                         class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 to-green-600 p-8 text-white shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105"
                     >
                         <div class="absolute inset-0 bg-gradient-to-br from-green-400 to-green-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
@@ -91,7 +93,7 @@ const navigateTo = (route: string) => {
 
                     <!-- Botón: Editar Ubicaciones -->
                     <button
-                        @click="navigateTo('/ubicaciones/editar')"
+                        @click="navigateTo(ubicaciones.editar().url)"
                         class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 p-8 text-white shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-105"
                     >
                         <div class="absolute inset-0 bg-gradient-to-br from-purple-400 to-purple-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AuthenticatedSessionController from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -7,15 +6,19 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
-import { register } from '@/routes';
-import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, router } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 
 defineProps<{
     status?: string;
     canResetPassword: boolean;
 }>();
+
+// Crear el form manualmente
+const form = {
+    action: '/admin/login',
+    method: 'post',
+};
 </script>
 
 <template>
@@ -33,7 +36,7 @@ defineProps<{
         </div>
 
         <Form
-            v-bind="AuthenticatedSessionController.store.form()"
+            v-bind="form"
             :reset-on-success="['password']"
             v-slot="{ errors, processing }"
             class="flex flex-col gap-6"
@@ -58,7 +61,7 @@ defineProps<{
                     <div class="flex items-center justify-between">
                         <Label for="password">Contraseña</Label>
                         <TextLink
-                            :href="request()"
+                            href="/admin/forgot-password"
                             class="text-sm"
                             :tabindex="5"
                         >

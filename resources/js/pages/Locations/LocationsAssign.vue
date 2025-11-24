@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { ubicaciones } from '@/routes';
+import { admin } from '@/routes-custom';
+
+const { ubicaciones } = admin;
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/vue3';
 import { onMounted, ref, computed, onUnmounted } from 'vue';
@@ -196,7 +198,10 @@ const saveLocation = async () => {
     isSaving.value = true;
 
     try {
-        const response = await axios.post(`/ubicaciones/api/${selectedProduct.value.id}`, {
+        const url = admin.ubicaciones.api.store(selectedProduct.value.id).url;
+        console.log('URL generada para guardar ubicación:', url);
+        console.log('admin.ubicaciones:', admin.ubicaciones);
+        const response = await axios.post(url, {
             latitude: coordinates.value.lat,
             longitude: coordinates.value.lng,
             address: address.value || null,

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
+import { admin } from '@/routes-custom';
 
 interface ProductImage {
   id: number;
@@ -20,6 +21,8 @@ const props = withDefaults(defineProps<Props>(), {
   canEdit: false,
 });
 
+const { proyectos } = admin;
+
 const selectedImage = ref<ProductImage | null>(null);
 const showLightbox = ref(false);
 
@@ -34,7 +37,7 @@ const currentIndex = computed(() => {
 
 const setPrimary = (imageId: number) => {
   if (confirm('¿Establecer como imagen principal?')) {
-    router.post(`/proyectos/${props.productId}/imagenes/${imageId}/principal`, {}, {
+    router.post(proyectos.images.setPrimary(props.productId, imageId).url, {}, {
       preserveScroll: true,
     });
   }
@@ -42,7 +45,7 @@ const setPrimary = (imageId: number) => {
 
 const deleteImage = (imageId: number) => {
   if (confirm('¿Estás seguro de eliminar esta imagen?')) {
-    router.delete(`/proyectos/${props.productId}/imagenes/${imageId}`, {
+    router.delete(proyectos.images.delete(props.productId, imageId).url, {
       preserveScroll: true,
     });
   }

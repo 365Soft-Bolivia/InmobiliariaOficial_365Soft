@@ -2,6 +2,9 @@
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import ProyectosEditDialog from './ProyectosEditDialog.vue';
+import { admin } from '@/routes-custom';
+
+const { proyectos } = admin;
 
 interface Category {
   id: number;
@@ -46,7 +49,7 @@ const selectedProduct = ref<Producto | null>(null);
 
 const toggleStatus = (id: number) => {
   if (confirm('¿Estás seguro de cambiar el estado de este proyecto?')) {
-    router.post(`/proyectos/${id}/toggle-status`, {}, {
+    router.post(proyectos.toggle(id).url, {}, {
       preserveScroll: true,
       onSuccess: () => {
         router.reload({ only: ['productos'] });
@@ -57,7 +60,7 @@ const toggleStatus = (id: number) => {
 
 const deleteProduct = (id: number, name: string) => {
   if (confirm(`¿Estás seguro de eliminar el proyecto "${name}"? Esta acción no se puede deshacer.`)) {
-    router.delete(`/proyectos/${id}`, {
+    router.delete(proyectos.destroy(id).url, {
       preserveScroll: true,
       onSuccess: () => {
         router.reload({ only: ['productos'] });
@@ -68,7 +71,7 @@ const deleteProduct = (id: number, name: string) => {
 
 // CAMBIADO: Navega a la página de detalles
 const viewProduct = (id: number) => {
-  router.visit(`/proyectos/${id}`);
+  router.visit(proyectos.show(id).url);
 };
 
 const editProduct = (product: Producto) => {

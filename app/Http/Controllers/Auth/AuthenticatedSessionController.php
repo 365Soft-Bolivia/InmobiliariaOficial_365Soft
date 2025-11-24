@@ -27,7 +27,12 @@ class AuthenticatedSessionController extends Controller
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+
+        return back()->withErrors([
+            'email' => 'Las credenciales proporcionadas no son correctas.',
+        ])->onlyInput('email');
     }
 
     public function destroy(Request $request): RedirectResponse
