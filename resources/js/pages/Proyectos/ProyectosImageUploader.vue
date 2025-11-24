@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { admin } from '@/routes-custom';
 
 interface Props {
   productId: number;
@@ -10,6 +11,8 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   uploaded: [];
 }>();
+
+const { proyectos } = admin;
 
 const form = useForm({
   images: [] as File[],
@@ -61,7 +64,7 @@ const removeFile = (index: number) => {
 };
 
 const submit = () => {
-  form.post(`/proyectos/${props.productId}/imagenes`, {
+  form.post(proyectos.images.store(props.productId).url, {
     preserveScroll: true,
     onSuccess: () => {
       form.reset();

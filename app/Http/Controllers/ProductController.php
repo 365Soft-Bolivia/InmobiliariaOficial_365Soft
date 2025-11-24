@@ -123,7 +123,7 @@ class ProductController extends Controller
 
         Product::create($validated);
 
-        return redirect()->route('products.index')
+        return redirect()->route('admin.proyectos.index')
             ->with('success', 'Proyecto creado correctamente.');
     }
 

@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, X, Settings } from 'lucide-vue-next';
 import AccesosCreateForm from './AccesosCreateForm.vue';
+import { admin } from '@/routes-custom';
+
+const { accesos, roles } = admin;
 
 interface Role {
   id: number;
@@ -33,7 +36,7 @@ const performSearch = (query: string) => {
   }
   
   searchTimeout = setTimeout(() => {
-    router.get('/accesos', 
+    router.get(accesos().url,
       { search: query },
       {
         preserveState: true,
@@ -55,7 +58,7 @@ const handleSearch = () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
-  router.get('/accesos', 
+  router.get(accesos().url,
     { search: searchQuery.value },
     {
       preserveState: true,
@@ -71,7 +74,7 @@ const clearSearch = () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
-  router.get('/accesos', 
+  router.get(accesos().url,
     {},
     {
       preserveState: true,
@@ -87,7 +90,7 @@ const handleCreate = () => {
 
 // Navegar a gestión de roles
 const goToRoles = () => {
-  router.visit('/roles');
+  router.visit(roles().url);
 };
 </script>
 

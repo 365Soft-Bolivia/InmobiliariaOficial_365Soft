@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, X, ArrowLeft } from 'lucide-vue-next';
 import RolesCreateForm from './RolesCreateForm.vue';
+import { admin } from '@/routes-custom';
+
+const { accesos, roles } = admin;
 
 const props = defineProps<{
   filters?: {
@@ -26,7 +29,7 @@ const performSearch = (query: string) => {
   }
   
   searchTimeout = setTimeout(() => {
-    router.get('/roles', 
+    router.get(roles().url,
       { search: query },
       {
         preserveState: true,
@@ -48,7 +51,7 @@ const handleSearch = () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
-  router.get('/roles', 
+  router.get(roles().url,
     { search: searchQuery.value },
     {
       preserveState: true,
@@ -64,7 +67,7 @@ const clearSearch = () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
-  router.get('/roles', 
+  router.get(roles().url,
     {},
     {
       preserveState: true,
@@ -80,7 +83,7 @@ const handleCreate = () => {
 
 // Volver a accesos
 const goToAccesos = () => {
-  router.visit('/accesos');
+  router.visit(accesos().url);
 };
 </script>
 

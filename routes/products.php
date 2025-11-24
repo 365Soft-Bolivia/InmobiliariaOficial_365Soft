@@ -4,21 +4,22 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductImageController;
 
-// CRUD completo
-Route::resource('products', ProductController::class)
-    ->middleware(['auth', 'verified', 'role:admin']);
-Route::middleware(['auth'])->group(function () {
-    Route::get('/proyectos', [ProductController::class, 'index'])->name('proyectos');
-    Route::get('/proyectos/{id}', [ProductController::class, 'show'])->name('products.show'); //ruta
-    Route::post('/proyectos', [ProductController::class, 'store'])->name('proyectos.store');
-    Route::put('/proyectos/{id}', [ProductController::class, 'update'])->name('proyectos.update');
-    Route::patch('/proyectos/{id}/toggle', [ProductController::class, 'toggleStatus'])->name('proyectos.toggle');
-    Route::delete('/proyectos/{id}', [ProductController::class, 'destroy'])->name('proyectos.destroy');
+// Rutas protegidas para productos (admin)
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->group(function () {
+    
+    // CRUD de proyectos/productos
+    Route::get('/proyectos', [ProductController::class, 'index'])->name('admin.proyectos.index');
+    Route::get('/proyectos/crear', [ProductController::class, 'create'])->name('admin.proyectos.create');
+    Route::post('/proyectos', [ProductController::class, 'store'])->name('admin.proyectos.store');
+    Route::get('/proyectos/{id}', [ProductController::class, 'show'])->name('admin.proyectos.show');
+    Route::get('/proyectos/{id}/editar', [ProductController::class, 'edit'])->name('admin.proyectos.edit');
+    Route::put('/proyectos/{id}', [ProductController::class, 'update'])->name('admin.proyectos.update');
+    Route::patch('/proyectos/{id}/toggle', [ProductController::class, 'toggleStatus'])->name('admin.proyectos.toggle');
+    Route::delete('/proyectos/{id}', [ProductController::class, 'destroy'])->name('admin.proyectos.destroy');
 
-
-    // Imágenes de productos
-    Route::post('/proyectos/{productId}/imagenes', [ProductImageController::class, 'store'])->name('products.images.store');
-    Route::post('/proyectos/{productId}/imagenes/{imageId}/principal', [ProductImageController::class, 'setPrimary'])->name('products.images.setPrimary');
-    Route::delete('/proyectos/{productId}/imagenes/{imageId}', [ProductImageController::class, 'destroy'])->name('products.images.destroy');
-    Route::post('/proyectos/{productId}/imagenes/reordenar', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
+    // Imágenes de proyectos
+    Route::post('/proyectos/{productId}/imagenes', [ProductImageController::class, 'store'])->name('admin.proyectos.images.store');
+    Route::post('/proyectos/{productId}/imagenes/{imageId}/principal', [ProductImageController::class, 'setPrimary'])->name('admin.proyectos.images.setPrimary');
+    Route::delete('/proyectos/{productId}/imagenes/{imageId}', [ProductImageController::class, 'destroy'])->name('admin.proyectos.images.destroy');
+    Route::post('/proyectos/{productId}/imagenes/reordenar', [ProductImageController::class, 'reorder'])->name('admin.proyectos.images.reorder');
 });

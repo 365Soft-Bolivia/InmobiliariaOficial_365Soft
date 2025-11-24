@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { admin } from '@/routes-custom';
 
 interface Category {
   id: number;
@@ -45,6 +46,8 @@ const emit = defineEmits<{
   updated: [];
 }>();
 
+const { proyectos } = admin;
+
 const form = useForm({
   name: props.product.name,
   codigo_inmueble: props.product.codigo_inmueble,
@@ -73,7 +76,7 @@ const form = useForm({
 const currentTab = ref<'general' | 'detalles' | 'otros'>('general');
 
 const submit = () => {
-  form.put(`/proyectos/${props.product.id}`, {
+  form.put(proyectos.update(props.product.id).url, {
     preserveScroll: true,
     onSuccess: () => {
       emit('updated');

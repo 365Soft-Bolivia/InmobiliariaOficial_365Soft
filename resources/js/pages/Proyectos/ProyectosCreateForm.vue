@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { admin } from '@/routes-custom';
+
+const { proyectos } = admin;
 
 interface Category {
   id: number;
@@ -43,7 +46,7 @@ const form = useForm({
 const currentTab = ref<'general' | 'detalles' | 'otros'>('general');
 
 const submit = () => {
-  form.post('/proyectos', {
+  form.post(proyectos.store().url, {
     preserveScroll: true,
     onSuccess: () => {
       emit('created');
