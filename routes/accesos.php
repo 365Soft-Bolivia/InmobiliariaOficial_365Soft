@@ -5,8 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'role:admin'])
     ->prefix('admin')
-    ->group(function () {
-dasd        // Ruta principal
+    ->group(function () {// Ruta principal
         Route::get('accesos', [AccesosController::class, 'index'])
             ->name('admin.accesos');
 
@@ -20,7 +19,6 @@ dasd        // Ruta principal
                 Route::put('/{id}', [AccesosController::class, 'update'])->name('update');
                 Route::delete('/{id}', [AccesosController::class, 'destroy'])->name('destroy');
             });
-    });
         Route::get('/listar', [AccesosController::class, 'listar'])->name('listar');
         
         Route::post('/{id}/toggle-status', [AccesosController::class, 'toggleStatus'])
