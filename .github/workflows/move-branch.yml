@@ -94,7 +94,7 @@ jobs:
               
               // Buscar el item del issue en el proyecto
               const itemQuery = `
-                query($org: String!, $number: Int!, $issueId: ID!) {
+                query($org: String!, $number: Int!) {
                   organization(login: $org) {
                     projectV2(number: $number) {
                       items(first: 100) {
@@ -115,8 +115,7 @@ jobs:
               
               const itemData = await github.graphql(itemQuery, {
                 org: owner,
-                number: projectNumber,
-                issueId: issue.data.node_id
+                number: projectNumber
               });
               
               const projectItem = itemData.organization.projectV2.items.nodes.find(
