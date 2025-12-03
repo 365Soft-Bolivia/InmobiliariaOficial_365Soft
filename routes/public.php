@@ -11,7 +11,7 @@ use App\Http\Controllers\Public\PropiedadPublicController;
 |--------------------------------------------------------------------------
 */
 
-// Listado de propiedades público
+// Listado de propiedades público (filtros básicos y avanzados)
 Route::get('/propiedades', [PropiedadPublicController::class, 'index'])->name('public.propiedades');
 
 // Detalle de una propiedad
