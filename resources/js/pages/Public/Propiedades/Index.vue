@@ -19,6 +19,9 @@ import {
     DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import publicRoutes from '@/routes/public';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-vue-next"; 
+
 
 interface Props {
     propiedades: any[];
@@ -202,14 +205,14 @@ watch(favoriteProperties, (newFavorites) => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+    <div class="h-screen bg-gray-50 dark:bg-gray-900 flex overflow-hidden">
         <!-- Sidebar estático ocultable -->
         <div
             :class="[
-                'bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out z-30',
+                'bg-white/80 dark:bg-[#0d1b2a] text-gray-800 dark:text-gray-200 border-r border-gray-300 dark:border-gray-700 backdrop-blur-sm transition-all duration-300 ease-in-out z-30',
                 sidebarCollapsed ? 'w-16' : 'w-80',
                 sidebarCollapsed ? 'fixed -translate-x-full lg:relative lg:translate-x-0' : 'fixed lg:relative',
-                'h-screen lg:h-auto overflow-y-auto'
+                'max-h-screen overflow-y-auto'
             ]"
         >
             <!-- Header del Sidebar -->
@@ -254,54 +257,65 @@ watch(favoriteProperties, (newFavorites) => {
                 -->
 
                 <!-- Filtro de Categorías -->
-                <div class="space-y-2">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Categorías
-                    </label>
-                    <div class="space-y-2 max-h-40 overflow-y-auto">
+                <Collapsible>
+                    <CollapsibleTrigger class="w-full flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded cursor-pointer">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Categorías</span>
+                        <ChevronDown class="w-4 h-4" />
+                    </CollapsibleTrigger>
+
+                    <CollapsibleContent class="mt-2 space-y-2 max-h-40 overflow-y-auto pl-2">
+                        <!-- Aquí VA TU CONTENIDO EXISTENTE TAL CUAL -->
                         <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                             <input type="checkbox" value="casa" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="text-sm text-gray-700 dark:text-gray-300">Casas</span>
                         </label>
+
                         <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                             <input type="checkbox" value="departamento" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="text-sm text-gray-700 dark:text-gray-300">Departamentos</span>
                         </label>
+
                         <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                             <input type="checkbox" value="terreno" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="text-sm text-gray-700 dark:text-gray-300">Terrenos</span>
                         </label>
+
                         <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                             <input type="checkbox" value="oficina" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="text-sm text-gray-700 dark:text-gray-300">Oficinas</span>
                         </label>
+
                         <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                             <input type="checkbox" value="local" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="text-sm text-gray-700 dark:text-gray-300">Locales Comerciales</span>
                         </label>
-                    </div>
-                </div>
+                    </CollapsibleContent>
+                </Collapsible>
 
                 <!-- Filtro de Tipo de Operación -->
-                <div class="space-y-2">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tipo de Operación
-                    </label>
-                    <div class="space-y-2">
+                <Collapsible>
+                    <CollapsibleTrigger class="w-full flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded cursor-pointer">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Operación</span>
+                        <ChevronDown class="w-4 h-4" />
+                    </CollapsibleTrigger>
+
+                    <CollapsibleContent class="mt-2 space-y-2 pl-2">
                         <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                             <input type="checkbox" value="venta" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="text-sm text-gray-700 dark:text-gray-300">Venta</span>
                         </label>
+
                         <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                             <input type="checkbox" value="alquiler" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="text-sm text-gray-700 dark:text-gray-300">Alquiler</span>
                         </label>
+
                         <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded">
                             <input type="checkbox" value="anticretico" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="text-sm text-gray-700 dark:text-gray-300">Anticrético</span>
                         </label>
-                    </div>
-                </div>
+                    </CollapsibleContent>
+                </Collapsible>
 
                 <!-- Filtros Numéricos -->
                 <div class="space-y-4">
@@ -352,7 +366,7 @@ watch(favoriteProperties, (newFavorites) => {
                 </div>
 
                 <!-- Filtros de Rango -->
-                <div class="space-y-6">
+                <div class="space-y-6 pb-20">
                     <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Rangos</h3>
 
                     <!-- Rango de Precios -->
@@ -409,9 +423,9 @@ watch(favoriteProperties, (newFavorites) => {
         </div>
 
         <!-- Contenido Principal -->
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1 flex flex-col max-col max-h-screen overflow-y-auto">
             <!-- Header del catálogo -->
-            <div class="bg-white dark:bg-gray-800 border-b sticky top-0 z-40">
+            <div class="bg-gray-900 text-gray-200 border-gray-700 border-b sticky top-0 z-40">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <!-- Título y contador -->
@@ -456,7 +470,7 @@ watch(favoriteProperties, (newFavorites) => {
 
             <!-- Contenido de propiedades -->
             <div class="flex-1 overflow-y-auto">
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-28">
                     <!-- Estado de carga -->
                     <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         <PropertyCardSkeleton :count="perPage" />
@@ -502,13 +516,6 @@ watch(favoriteProperties, (newFavorites) => {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-}
-
-/* Asegurar buen spacing en móviles */
-@media (max-width: 640px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {
