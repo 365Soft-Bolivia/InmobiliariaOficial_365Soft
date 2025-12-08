@@ -769,300 +769,528 @@ const removeFullScreenStyles = () => {
         <!-- Mapa -->
         <div ref="mapContainer" class="absolute inset-0 w-full h-full"></div>
 
-            <!-- Controles superiores -->
-            <div class="absolute top-4 left-4 right-4 z-[1000] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3" @click.stop>
-                <!-- Controles de navegación y categorías -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-wrap">
-                    <button
-                        @click="goToHome"
-                        class="bg-white/95 hover:bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm"
-                        title="Inicio"
-                    >
-                        <Home :size="18" />
-                        <span class="font-semibold hidden sm:inline text-sm">Inicio</span>
-                    </button>
+        <!-- ===========================
+             CONTROLES DESKTOP (OCULTOS EN MÓVIL)
+             =========================== -->
+        <div class="absolute top-4 left-4 right-4 z-[1000] hidden lg:flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3" @click.stop>
+            <!-- Controles de navegación y categorías (desktop) -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-wrap">
+                <button
+                    @click="goToHome"
+                    class="bg-white/95 hover:bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm"
+                    title="Inicio"
+                >
+                    <Home :size="18" />
+                    <span class="font-semibold hidden sm:inline text-sm">Inicio</span>
+                </button>
 
+                <button
+                    @click="goToProperties"
+                    class="bg-white/95 hover:bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm"
+                    title="Ver todas las propiedades"
+                >
+                    <Filter :size="18" />
+                    <span class="font-semibold hidden sm:inline text-sm">Propiedades</span>
+                </button>
+
+                <!-- Dropdown de categorías (desktop) -->
+                <div class="relative">
                     <button
-                        @click="goToProperties"
-                        class="bg-white/95 hover:bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm"
-                        title="Ver todas las propiedades"
+                        @click.stop="showCategoryDropdown = !showCategoryDropdown"
+                        class="bg-white/95 hover:bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm min-w-[160px]"
+                        title="Filtrar por categoría"
                     >
                         <Filter :size="18" />
-                        <span class="font-semibold hidden sm:inline text-sm">Propiedades</span>
+                        <span class="font-medium text-sm truncate">{{ nombreCategoriaSeleccionada }}</span>
+                        <ChevronDown :size="16" :class="{ 'rotate-180': showCategoryDropdown }" class="transition-transform flex-shrink-0" />
                     </button>
 
-                    <!-- Dropdown de categorías -->
-                    <div class="relative">
-                        <button
-                            @click.stop="showCategoryDropdown = !showCategoryDropdown"
-                            class="bg-white/95 hover:bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm min-w-[160px]"
-                            title="Filtrar por categoría"
-                        >
-                            <Filter :size="18" />
-                            <span class="font-medium text-sm truncate">{{ nombreCategoriaSeleccionada }}</span>
-                            <ChevronDown :size="16" :class="{ 'rotate-180': showCategoryDropdown }" class="transition-transform flex-shrink-0" />
-                        </button>
+                    <!-- Dropdown menu -->
+                    <div
+                        v-if="showCategoryDropdown"
+                        class="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-80 overflow-y-auto"
+                        @click.stop
+                    >
+                        <div class="p-2">
+                            <button
+                                @click="selectCategoria(null)"
+                                :class="[
+                                    'w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between',
+                                    !categoriaSeleccionada
+                                        ? 'bg-blue-50 text-blue-700 font-medium'
+                                        : 'hover:bg-gray-50 text-gray-700'
+                                ]"
+                            >
+                                <span>Todas las categorías</span>
+                                <span v-if="!categoriaSeleccionada" class="text-blue-600">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </button>
 
-                        <!-- Dropdown menu -->
-                        <div
-                            v-if="showCategoryDropdown"
-                            class="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-80 overflow-y-auto"
-                            @click.stop
-                        >
-                            <div class="p-2">
-                                <!-- Opción "Todas" -->
-                                <button
-                                    @click="selectCategoria(null)"
-                                    :class="[
-                                        'w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between',
-                                        !categoriaSeleccionada
-                                            ? 'bg-blue-50 text-blue-700 font-medium'
-                                            : 'hover:bg-gray-50 text-gray-700'
-                                    ]"
-                                >
-                                    <span>Todas las categorías</span>
-                                    <span v-if="!categoriaSeleccionada" class="text-blue-600">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                        </svg>
-                                    </span>
-                                </button>
+                            <div class="border-t border-gray-100 my-1"></div>
 
-                                <div class="border-t border-gray-100 my-1"></div>
-
-                                <!-- Lista de categorías -->
-                                <button
-                                    v-for="(nombre, id) in categoriasDisponibles"
-                                    :key="id"
-                                    @click="selectCategoria(parseInt(id as string))"
-                                    :class="[
-                                        'w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between',
-                                        categoriaSeleccionada === parseInt(id as string)
-                                            ? 'bg-blue-50 text-blue-700 font-medium'
-                                            : 'hover:bg-gray-50 text-gray-700'
-                                    ]"
-                                >
-                                    <span class="truncate">{{ nombre }}</span>
-                                    <span v-if="categoriaSeleccionada === parseInt(id as string)" class="text-blue-600 flex-shrink-0">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                        </svg>
-                                    </span>
-                                </button>
-                            </div>
+                            <button
+                                v-for="(nombre, id) in categoriasDisponibles"
+                                :key="id"
+                                @click="selectCategoria(parseInt(id as string))"
+                                :class="[
+                                    'w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between',
+                                    categoriaSeleccionada === parseInt(id as string)
+                                        ? 'bg-blue-50 text-blue-700 font-medium'
+                                        : 'hover:bg-gray-50 text-gray-700'
+                                ]"
+                            >
+                                <span class="truncate">{{ nombre }}</span>
+                                <span v-if="categoriaSeleccionada === parseInt(id as string)" class="text-blue-600 flex-shrink-0">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- Controles del mapa -->
-                <div class="flex items-center gap-2 flex-wrap">
-                    <div class="bg-white/95 px-3 py-2 rounded-lg shadow-lg backdrop-blur-sm">
-                        <p class="text-xs sm:text-sm font-semibold text-gray-700">
-                            {{ totalPropiedadesFiltradas }} de {{ totalPropiedades }} propiedades
-                        </p>
-                    </div>
-
-                    <button
-                        @click="centerOnMyLocation"
-                        :disabled="isLocatingUser"
-                        :class="[
-                            'p-2 sm:p-3 rounded-lg shadow-lg transition-all flex items-center gap-2 backdrop-blur-sm',
-                            isLocatingUser
-                                ? 'bg-blue-400/90 cursor-not-allowed'
-                                : 'bg-blue-600/90 hover:bg-blue-700/90'
-                        ]"
-                        class="text-white"
-                        title="Centrar en mi ubicación"
-                    >
-                        <Navigation :size="18" :class="isLocatingUser ? 'animate-pulse' : ''" />
-                        <span v-if="isLocatingUser" class="text-xs sm:text-sm font-medium hidden sm:inline">Ubicando...</span>
-                    </button>
-
-                    <button
-                        @click="resetView"
-                        class="bg-white/95 hover:bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm"
-                        title="Ver todas las propiedades"
-                    >
-                        <MapPin :size="18" />
-                        <span class="font-semibold hidden sm:inline text-sm">Ver Todo</span>
-                    </button>
                 </div>
             </div>
 
-            <!-- Panel de Detalles del Producto -->
-            <Transition
-                @click.stop
-                enter-active-class="transition-transform duration-300"
-                enter-from-class="translate-x-full"
-                enter-to-class="translate-x-0"
-                leave-active-class="transition-transform duration-300"
-                leave-from-class="translate-x-0"
-                leave-to-class="translate-x-full"
-            >
-                <div
-                    v-if="selectedProduct"
-                    class="absolute top-0 right-0 h-full w-full sm:max-w-sm md:w-96 bg-white shadow-2xl z-[1001] overflow-y-auto"
+            <!-- Controles del mapa (desktop) -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="bg-white/95 px-3 py-2 rounded-lg shadow-lg backdrop-blur-sm">
+                    <p class="text-xs sm:text-sm font-semibold text-gray-700">
+                        {{ totalPropiedadesFiltradas }} de {{ totalPropiedades }} propiedades
+                    </p>
+                </div>
+
+                <button
+                    @click="centerOnMyLocation"
+                    :disabled="isLocatingUser"
+                    :class="[
+                        'p-2 sm:p-3 rounded-lg shadow-lg transition-all flex items-center gap-2 backdrop-blur-sm',
+                        isLocatingUser
+                            ? 'bg-blue-400/90 cursor-not-allowed'
+                            : 'bg-blue-600/90 hover:bg-blue-700/90'
+                    ]"
+                    class="text-white"
+                    title="Centrar en mi ubicación"
                 >
-                    <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 p-4 flex items-center justify-between">
-                        <h3 class="font-bold text-lg text-white">Detalles de la Propiedad</h3>
-                        <button
-                            @click="closeDetails"
-                            class="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
-                        >
-                            <X :size="24" />
-                        </button>
+                    <Navigation :size="18" :class="isLocatingUser ? 'animate-pulse' : ''" />
+                    <span v-if="isLocatingUser" class="text-xs sm:text-sm font-medium hidden sm:inline">Ubicando...</span>
+                </button>
+
+                <button
+                    @click="resetView"
+                    class="bg-white/95 hover:bg-white text-gray-700 px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm"
+                    title="Ver todas las propiedades"
+                >
+                    <MapPin :size="18" />
+                    <span class="font-semibold hidden sm:inline text-sm">Ver Todo</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===========================
+             CONTROLES MÓVIL (solo en pantallas < lg)
+             Posicionados como en tu imagen:
+             - Home + Propiedades arriba-izq
+             - Dropdown "Todas las categorías" arriba-der
+             - Badge contadora cerca del botón azul
+             - Botón azul (centerOnMyLocation) abajo-derecha
+             - Botón de ubicación (resetView) debajo/izquierda del botón azul
+             =========================== -->
+        <div class="map-mobile-controls lg:hidden" aria-hidden="false" @click.stop>
+          <!-- Top-left: casa + filtro (mantienen sus handlers) -->
+          <div class="mobile-top-left-controls">
+            <button
+              @click="goToHome"
+              class="mobile-icon btn-icon"
+              title="Inicio"
+            >
+              <Home :size="18" />
+            </button>
+
+            <button
+              @click="goToProperties"
+              class="mobile-icon btn-icon"
+              title="Propiedades"
+            >
+              <Filter :size="18" />
+            </button>
+          </div>
+
+          <!-- Top-right: dropdown compacto -->
+          <div class="mobile-top-right-categories">
+            <button
+              @click.stop="showCategoryDropdown = !showCategoryDropdown"
+              class="mobile-cats btn-small"
+              title="Filtrar por categoría"
+            >
+              <span class="truncate text-sm">{{ nombreCategoriaSeleccionada }}</span>
+              <ChevronDown :size="14" :class="{ 'rotate-180': showCategoryDropdown }" class="transition-transform ml-1" />
+            </button>
+
+            <!-- Dropdown (mobile) reusa tu menu -->
+            <div
+              v-if="showCategoryDropdown"
+              class="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-80 overflow-y-auto"
+              @click.stop
+            >
+              <div class="p-2">
+                <button
+                  @click="selectCategoria(null)"
+                  :class="[
+                      'w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between',
+                      !categoriaSeleccionada
+                          ? 'bg-blue-50 text-blue-700 font-medium'
+                          : 'hover:bg-gray-50 text-gray-700'
+                  ]"
+                >
+                  <span>Todas las categorías</span>
+                  <span v-if="!categoriaSeleccionada" class="text-blue-600">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                  </span>
+                </button>
+
+                <div class="border-t border-gray-100 my-1"></div>
+
+                <button
+                  v-for="(nombre, id) in categoriasDisponibles"
+                  :key="id"
+                  @click="selectCategoria(parseInt(id as string))"
+                  :class="[
+                      'w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between',
+                      categoriaSeleccionada === parseInt(id as string)
+                          ? 'bg-blue-50 text-blue-700 font-medium'
+                          : 'hover:bg-gray-50 text-gray-700'
+                  ]"
+                >
+                  <span class="truncate">{{ nombre }}</span>
+                  <span v-if="categoriaSeleccionada === parseInt(id as string)" class="text-blue-600 flex-shrink-0">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Badge contador (ubicado cerca del botón azul) -->
+          <div class="mobile-prop-count">
+            <div class="badge text-xs">
+              {{ totalPropiedadesFiltradas }} de {{ totalPropiedades }}
+            </div>
+          </div>
+
+          <!-- Botón azul (centerOnMyLocation) bottom-right -->
+          <button
+            @click="centerOnMyLocation"
+            :disabled="isLocatingUser"
+            :class="[
+              'map-btn-blue',
+              isLocatingUser ? 'opacity-80 cursor-not-allowed' : ''
+            ]"
+            title="Centrar en mi ubicación"
+          >
+            <Navigation :size="20" :class="isLocatingUser ? 'animate-pulse' : ''" />
+          </button>
+
+          <!-- Botón ubicación (resetView): debajo/izquierda del botón azul -->
+          <button
+            @click="resetView"
+            class="map-btn-loc"
+            title="Ver Todo"
+          >
+            <MapPin :size="18" />
+          </button>
+        </div>
+
+        <!-- Panel de Detalles del Producto -->
+        <Transition
+            @click.stop
+            enter-active-class="transition-transform duration-300"
+            enter-from-class="translate-x-full"
+            enter-to-class="translate-x-0"
+            leave-active-class="transition-transform duration-300"
+            leave-from-class="translate-x-0"
+            leave-to-class="translate-x-full"
+        >
+            <div
+                v-if="selectedProduct"
+                class="absolute top-0 right-0 h-full w-full sm:max-w-sm md:w-96 bg-white shadow-2xl z-[1001] overflow-y-auto"
+            >
+                <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 p-4 flex items-center justify-between">
+                    <h3 class="font-bold text-lg text-white">Detalles de la Propiedad</h3>
+                    <button
+                        @click="closeDetails"
+                        class="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
+                    >
+                        <X :size="24" />
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <div v-if="sortedImages.length > 0" class="mb-6 -mx-6 -mt-6">
+                        <div class="relative group">
+                            <img
+                                :src="getImageUrl(sortedImages[currentImageIndex].image_path)"
+                                :alt="sortedImages[currentImageIndex].original_name"
+                                class="w-full h-64 object-cover"
+                            />
+
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+
+                            <template v-if="sortedImages.length > 1">
+                                <button
+                                    @click="prevImage"
+                                    class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
+                                >
+                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+
+                                <button
+                                    @click="nextImage"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
+                                >
+                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+
+                                <div class="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
+                                    {{ currentImageIndex + 1 }} / {{ sortedImages.length }}
+                                </div>
+                            </template>
+
+                            <div v-if="sortedImages[currentImageIndex].is_primary" class="absolute top-3 left-3">
+                                <span class="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold shadow-lg">
+                                    <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    Principal
+                                </span>
+                            </div>
+                        </div>
+
+                        <div v-if="sortedImages.length > 1" class="px-4 py-3 bg-gray-50">
+                            <div class="flex gap-2 overflow-x-auto pb-2">
+                                <button
+                                    v-for="(image, index) in sortedImages"
+                                    :key="image.id"
+                                    @click="goToImage(index)"
+                                    :class="[
+                                        'flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all border-2',
+                                        currentImageIndex === index
+                                            ? 'border-blue-500 ring-2 ring-blue-200 scale-110'
+                                            : 'border-transparent opacity-60 hover:opacity-100'
+                                    ]"
+                                >
+                                    <img
+                                        :src="getImageUrl(image.image_path)"
+                                        :alt="`Thumbnail ${index + 1}`"
+                                        class="w-full h-full object-cover"
+                                    />
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="p-6">
-                        <div v-if="sortedImages.length > 0" class="mb-6 -mx-6 -mt-6">
-                            <div class="relative group">
-                                <img
-                                    :src="getImageUrl(sortedImages[currentImageIndex].image_path)"
-                                    :alt="sortedImages[currentImageIndex].original_name"
-                                    class="w-full h-64 object-cover"
-                                />
+                    <div v-else class="mb-4 w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center -mx-6 -mt-6">
+                        <div class="text-center">
+                            <MapPin :size="48" class="text-gray-400 mx-auto mb-2" />
+                            <span class="text-gray-400 text-sm">Sin imágenes disponibles</span>
+                        </div>
+                    </div>
 
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-900 mb-2">
+                                {{ selectedProduct.name }}
+                            </h4>
 
-                                <template v-if="sortedImages.length > 1">
-                                    <button
-                                        @click="prevImage"
-                                        class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
-                                    >
-                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-                                        </svg>
-                                    </button>
-
-                                    <button
-                                        @click="nextImage"
-                                        class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
-                                    >
-                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </button>
-
-                                    <div class="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
-                                        {{ currentImageIndex + 1 }} / {{ sortedImages.length }}
-                                    </div>
-                                </template>
-
-                                <div v-if="sortedImages[currentImageIndex].is_primary" class="absolute top-3 left-3">
-                                    <span class="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold shadow-lg">
-                                        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                        Principal
-                                    </span>
-                                </div>
+                            <div class="inline-flex items-center gap-2 mb-3">
+                                <span :class="[
+                                    'inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium',
+                                    selectedProduct.operacion === 'venta' ? 'bg-green-100 text-green-800' :
+                                    selectedProduct.operacion === 'alquiler' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-purple-100 text-purple-800'
+                                ]">
+                                    <span class="text-lg">{{ getOperacionIcon(selectedProduct.operacion) }}</span>
+                                    {{ selectedProduct.operacion.charAt(0).toUpperCase() + selectedProduct.operacion.slice(1) }}
+                                </span>
                             </div>
 
-                            <div v-if="sortedImages.length > 1" class="px-4 py-3 bg-gray-50">
-                                <div class="flex gap-2 overflow-x-auto pb-2">
-                                    <button
-                                        v-for="(image, index) in sortedImages"
-                                        :key="image.id"
-                                        @click="goToImage(index)"
-                                        :class="[
-                                            'flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all border-2',
-                                            currentImageIndex === index
-                                                ? 'border-blue-500 ring-2 ring-blue-200 scale-110'
-                                                : 'border-transparent opacity-60 hover:opacity-100'
-                                        ]"
-                                    >
-                                        <img
-                                            :src="getImageUrl(image.image_path)"
-                                            :alt="`Thumbnail ${index + 1}`"
-                                            class="w-full h-full object-cover"
-                                        />
-                                    </button>
+                            <div class="inline-flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg">
+                                <span class="text-sm text-green-600 font-medium">Precio:</span>
+                                <span class="text-2xl font-bold text-green-600">
+                                    {{ formatPrice(selectedProduct.price) }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500 mb-1">Código</p>
+                                <p class="font-semibold text-gray-800">{{ selectedProduct.codigo_inmueble }}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500 mb-1">Categoría</p>
+                                <p class="font-semibold text-gray-800">{{ selectedProduct.category || 'N/A' }}</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <div class="flex items-start gap-2">
+                                <MapPin :size="20" class="text-blue-600 mt-0.5 flex-shrink-0" />
+                                <div class="flex-1">
+                                    <p class="text-xs text-blue-600 font-medium mb-1">Ubicación</p>
+                                    <p class="text-sm text-gray-700 mb-2">
+                                        {{ selectedProduct.location.address || 'Sin dirección especificada' }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 font-mono">
+                                        {{ selectedProduct.location.latitude.toFixed(6) }},
+                                        {{ selectedProduct.location.longitude.toFixed(6) }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div v-else class="mb-4 w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center -mx-6 -mt-6">
-                            <div class="text-center">
-                                <MapPin :size="48" class="text-gray-400 mx-auto mb-2" />
-                                <span class="text-gray-400 text-sm">Sin imágenes disponibles</span>
-                            </div>
-                        </div>
+                        <div class="flex gap-3">
+                            <a
+                                :href="`https://www.google.com/maps/search/?api=1&query=${selectedProduct.location.latitude},${selectedProduct.location.longitude}`"
+                                target="_blank"
+                                class="flex items-center justify-center gap-2 flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors"
+                            >
+                                <Navigation :size="20" />
+                                Google Maps
+                            </a>
 
-                        <div class="space-y-4">
-                            <div>
-                                <h4 class="text-xl font-bold text-gray-900 mb-2">
-                                    {{ selectedProduct.name }}
-                                </h4>
-
-                                <!-- Badge de operación -->
-                                <div class="inline-flex items-center gap-2 mb-3">
-                                    <span :class="[
-                                        'inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium',
-                                        selectedProduct.operacion === 'venta' ? 'bg-green-100 text-green-800' :
-                                        selectedProduct.operacion === 'alquiler' ? 'bg-blue-100 text-blue-800' :
-                                        'bg-purple-100 text-purple-800'
-                                    ]">
-                                        <span class="text-lg">{{ getOperacionIcon(selectedProduct.operacion) }}</span>
-                                        {{ selectedProduct.operacion.charAt(0).toUpperCase() + selectedProduct.operacion.slice(1) }}
-                                    </span>
-                                </div>
-
-                                <div class="inline-flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg">
-                                    <span class="text-sm text-green-600 font-medium">Precio:</span>
-                                    <span class="text-2xl font-bold text-green-600">
-                                        {{ formatPrice(selectedProduct.price) }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-gray-50 p-3 rounded-lg">
-                                    <p class="text-xs text-gray-500 mb-1">Código</p>
-                                    <p class="font-semibold text-gray-800">{{ selectedProduct.codigo_inmueble }}</p>
-                                </div>
-                                <div class="bg-gray-50 p-3 rounded-lg">
-                                    <p class="text-xs text-gray-500 mb-1">Categoría</p>
-                                    <p class="font-semibold text-gray-800">{{ selectedProduct.category || 'N/A' }}</p>
-                                </div>
-                            </div>
-
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <div class="flex items-start gap-2">
-                                    <MapPin :size="20" class="text-blue-600 mt-0.5 flex-shrink-0" />
-                                    <div class="flex-1">
-                                        <p class="text-xs text-blue-600 font-medium mb-1">Ubicación</p>
-                                        <p class="text-sm text-gray-700 mb-2">
-                                            {{ selectedProduct.location.address || 'Sin dirección especificada' }}
-                                        </p>
-                                        <p class="text-xs text-gray-500 font-mono">
-                                            {{ selectedProduct.location.latitude.toFixed(6) }},
-                                            {{ selectedProduct.location.longitude.toFixed(6) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex gap-3">
-                                <a
-                                    :href="`https://www.google.com/maps/search/?api=1&query=${selectedProduct.location.latitude},${selectedProduct.location.longitude}`"
-                                    target="_blank"
-                                    class="flex items-center justify-center gap-2 flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors"
-                                >
-                                    <Navigation :size="20" />
-                                    Google Maps
-                                </a>
-
-                                <a
-                                    :href="`/propiedad/${selectedProduct.id}`"
-                                    class="flex items-center justify-center gap-2 flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition-colors"
-                                >
-                                    <Search :size="20" />
-                                    Ver Más
-                                </a>
-                            </div>
+                            <a
+                                :href="`/propiedad/${selectedProduct.id}`"
+                                class="flex items-center justify-center gap-2 flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition-colors"
+                            >
+                                <Search :size="20" />
+                                Ver Más
+                            </a>
                         </div>
                     </div>
                 </div>
-            </Transition>
+            </div>
+        </Transition>
     </div>
 </template>
+
+<style>
+/* MOBILE ONLY positions for map controls (no scoped) */
+@media (max-width: 1024px) {
+  .map-mobile-controls {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1200;
+  }
+
+  .map-mobile-controls > * {
+    pointer-events: auto;
+    position: absolute;
+  }
+
+  /* Top-left cluster: home + properties */
+  .mobile-top-left-controls {
+    left: 0.6rem;
+    top: 0.9rem;
+    display: flex;
+    gap: 0.45rem;
+    align-items: center;
+  }
+  .mobile-top-left-controls .btn-icon,
+  .mobile-top-left-controls .mobile-icon {
+    background: rgba(255,255,255,0.95);
+    border-radius: 0.5rem;
+    padding: 0.45rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.06);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Top-right: dropdown "Todas las categorías" */
+  .mobile-top-right-categories {
+    right: 0.6rem;
+    top: 0.9rem;
+  }
+  .mobile-top-right-categories .mobile-cats {
+    background: rgba(255,255,255,0.95);
+    padding: 0.45rem 0.6rem;
+    border-radius: 0.5rem;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  /* Prop-count badge: ubícalo encima/derecha del botón azul */
+  .mobile-prop-count {
+    right: 4.6rem;
+    bottom: 7.7rem;
+    display: flex;
+    align-items: center;
+  }
+  .mobile-prop-count .badge {
+    background: rgba(255,255,255,0.95);
+    padding: 0.35rem 0.6rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  /* BOTON AZUL (principal) bottom-right */
+  .map-btn-blue {
+    right: 1rem;
+    bottom: 3.6rem;
+    width: 46px;
+    height: 46px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #2563eb;
+    color: white;
+    box-shadow: 0 10px 30px rgba(37,99,235,0.18);
+    border: none;
+    border-radius: 9999px;
+  }
+
+  /* BOTON UBICACION: un poco arriba/izquierda respecto del botón azul */
+  .map-btn-loc {
+    right: 1.3rem; /* distancia horizontal desde el borde derecho; ajusta si quieres */
+    bottom: 7.5rem; /* distancia vertical desde el borde inferior; ajusta si quieres */
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  /* compact adjustments small screens */
+  @media (max-width: 420px) {
+    .map-btn-blue { right: 0.8rem; bottom: 1.95rem; width: 42px; height: 42px; }
+    .map-btn-loc { right: 1.0rem; bottom: 5.4rem; width: 36px; height: 36px; }
+    .mobile-prop-count { right: 4.0rem; bottom: 5.7rem; }
+    .mobile-top-right-categories .mobile-cats { padding: 0.35rem 0.5rem; font-size: 0.74rem; }
+  }
+}
+</style>
