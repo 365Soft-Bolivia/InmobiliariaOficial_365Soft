@@ -832,7 +832,9 @@ const tieneAdicionalesActivas = computed(() => {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Scrollbar personalizada */
+/* ============================================================
+   SCROLLBAR PERSONALIZADA (tu código original)
+   ============================================================ */
 .overflow-y-auto::-webkit-scrollbar {
     width: 6px;
 }
@@ -850,6 +852,28 @@ const tieneAdicionalesActivas = computed(() => {
     background-color: rgb(75 85 99);
 }
 
+/* ============================================================
+   NUEVO: Scrollbar reacciona al color de la pantalla (opción 2)
+   ============================================================ */
+
+/* Modo claro — pantalla blanca → scrollbar blanco */
+.light-mode .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #ffffff;
+}
+
+/* Modo oscuro — pantalla negra → scrollbar azul marino */
+.dark .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #001f3f; /* azul marino */
+}
+
+/* Hover */
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    opacity: 0.8;
+}
+
+/* ============================================================ */
+
+
 /* Hover effects */
 .hover\:bg-gray-50:hover {
     background-color: rgb(249 250 251);
@@ -859,12 +883,12 @@ const tieneAdicionalesActivas = computed(() => {
     background-color: rgb(55 65 81);
 }
 
-/* Asegurar que los checkboxes estén bien alineados */
+/* Alinear checkboxes */
 input[type="checkbox"] {
     margin-top: 2px;
 }
 
-/* Responsive para móviles - sidebar se convierte en modal */
+/* Responsive */
 @media (max-width: 768px) {
     .h-\[calc\(100vh-80px\)\] {
         height: 100vh;
