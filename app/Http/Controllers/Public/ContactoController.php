@@ -28,21 +28,27 @@ public function store(Request $request)
         'mensaje' => 'required|string|max:2000'
     ]);
 
-    Lead::create([
-        'client_name' => $validated['nombre'] . ' ' . $validated['apellido'],
-        'client_email' => $validated['email'],
-        'mobile' => $validated['telefono'],
-        'note' => $validated['mensaje'],
-        'carnet' => $validated['carnet'], // si tienes campo carnet real en DB cámbialo
-        'source_id' => 1,     // Web formulario (depende de tu DB)
-        'status_id' => 1,     // Status inicial
-        'column_priority' => 1,
-        'added_by' => null,   // Nadie logueado
-        'company_id' => 1
+    // 1. CREAR LEAD PRINCIPAL
+    $lead = Lead::create([
+        'client_name'      => $validated['nombre'] . ' ' . $validated['apellido'],
+        'client_email'     => $validated['email'],
+        'numero1'           => $validated['telefono'],
+        'note'             => $validated['mensaje'],
+        'carnet'           => $validated['carnet'],
+        'source_id'        => 1,  // Web
+        'status_id'        => 1,
+        'column_priority'  => 1,
+        'added_by'         => 1,
+        'company_id'       => 1
     ]);
 
-        return redirect()->back()->with([
-            'success' => 'Tu solicitud fue enviada correctamente ✔️'
-        ]);
+    // 2. REGISTRAR EN TABLA lead_web
+    \App\Models\LeadWeb::create([
+        'lead_id' => $lead->id,
+        'is_web'  => true
+    ]);
+
+    return back()->with('success', 'Tu solicitud fue enviada correctamente ✔️');
 }
+
 }

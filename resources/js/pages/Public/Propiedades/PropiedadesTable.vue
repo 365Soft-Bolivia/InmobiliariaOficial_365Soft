@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Pagination from '@/components/public/Pagination.vue';
 import publicRoutes from '@/routes/public';
+import { Heart } from 'lucide-vue-next';
 
 interface ProductImage {
     id: number;

@@ -89,132 +89,134 @@ const handleSubmit = () => {
         <div class="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 px-6 lg:px-10">
 
             <!-- FORMULARIO DENTRO DE UN CUADRO CAFÉ -->
-            <div
-                class="bg-[#5c4a3b] p-8 rounded-2xl shadow-xl backdrop-blur-md border border-[#8b7a61] transition-all"
+<div
+    class="p-8 rounded-2xl shadow-2xl backdrop-blur-lg transition-all
+    bg-[#F8F9FC]/95 border border-[#E1E5EB]
+    dark:bg-[#0D1B2A]/90 dark:border-[#1f2a44]
+    hover:shadow-[0_8px_30px_rgba(0,0,0,0.15)]
+    dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.45)]
+    animate-fade-in"
+>
+    <h2 class="text-3xl font-bold mb-6
+                text-gray-900
+                dark:text-white">
+        Cuéntanos tu experiencia
+    </h2>
+
+    <form @submit.prevent="handleSubmit" class="space-y-4">
+
+        <!-- Campos reutilizables -->
+        <div v-for="field in ['nombre','apellido','email','carnet','telefono']" :key="field">
+
+            <label class="block font-semibold mb-1
+                            text-gray-800
+                            dark:text-gray-200 capitalize">
+                {{ field }} *
+            </label>
+
+            <p v-if="errors[field]"
+                class="text-red-600 dark:text-red-300 text-sm mb-1">
+                {{ errors[field] }}
+            </p>
+
+            <input
+                v-model="form[field]"
+                type="text"
+                class="w-full
+                bg-[#F1F3F8] border border-[#D6DAE1]
+                text-[#1F2D3D] placeholder-gray-500
+                
+                dark:bg-[#112034] dark:border-[#2e3a55]
+                dark:text-white dark:placeholder-gray-300
+
+                px-4 py-3 rounded-xl
+                focus:ring-2 focus:ring-[#F8C200] focus:border-transparent
+                shadow-inner transition"
             >
-                <h2 class="text-3xl font-bold mb-6 text-white placeholder-white">Cuéntanos tu experiencia</h2>
+        </div>
 
-                <form @submit.prevent="handleSubmit" class="space-y-3">
+        <!-- Mensaje -->
+        <div>
+            <label class="block font-semibold mb-1
+                        text-gray-800
+                        dark:text-gray-200">
+                Mensaje *
+            </label>
 
-                    <!-- Nombre -->
-                    <div>
-                        <label class="block font-semibold mb-1">Nombre *</label>
-                        <p v-if="errors.nombre" class="text-red-700 dark:text-red-300 text-sm mb-1">{{ errors.nombre }}</p>
+            <p v-if="errors.mensaje"
+                class="text-red-600 dark:text-red-300 text-sm mb-1">
+                {{ errors.mensaje }}
+            </p>
 
-                        <input
-                            v-model="form.nombre"
-                            type="text"
-                            class="w-full bg-white/80 dark:bg-black/40 border border-gray-300 dark:border-gray-600
-                                px-4 py-3 rounded-md focus:ring-2 focus:ring-yellow-400 
-                                text-white placeholder-white backdrop-blur-sm"
-                        >
-                    </div>
+            <textarea
+                v-model="form.mensaje"
+                rows="5"
+                class="w-full
+                    bg-[#F1F3F8] border border-[#D6DAE1]
+                    text-[#1F2D3D] placeholder-gray-500
+                    
+                    dark:bg-[#112034] dark:border-[#2e3a55]
+                    dark:text-white dark:placeholder-gray-300
 
-                    <!-- Apellido -->
-                    <div>
-                        <label class="block font-semibold mb-1">Apellido *</label>
-                        <p v-if="errors.apellido" class="text-red-700 dark:text-red-300 text-sm mb-1">{{ errors.apellido }}</p>
+                    px-4 py-3 rounded-xl
+                    focus:ring-2 focus:ring-[#F8C200] focus:border-transparent
+                    shadow-inner transition"
+            ></textarea>
+        </div>
 
-                        <input
-                            v-model="form.apellido"
-                            type="text"
-                            class="w-full bg-white/80 dark:bg-black/40 border border-gray-300 dark:border-gray-600
-                                px-4 py-3 rounded-md focus:ring-2 focus:ring-yellow-400 
-                                text-white placeholder-white backdrop-blur-sm"
-                        >
-                    </div>
+        <button
+            type="submit"
+        class="bg-[#F8C200] text-black
+            dark:bg-[#F8C200] dark:text-black
+            font-semibold px-10 py-3 rounded-xl 
+            hover:bg-[#EAB308] active:scale-[0.98]
+            transition shadow-md hover:shadow-lg w-full
+            tracking-wide"
+        >
+            Contactar
+        </button>
 
-                    <!-- Email -->
-                    <div>
-                        <label class="block font-semibold mb-1">Email *</label>
-                        <p v-if="errors.email" class="text-red-700 dark:text-red-300 text-sm mb-1">{{ errors.email }}</p>
+    </form>
+</div>
 
-                        <input
-                            v-model="form.email"
-                            type="email"
-                            class="w-full bg-white/80 dark:bg-black/40 border border-gray-300 dark:border-gray-600
-                                px-4 py-3 rounded-md focus:ring-2 focus:ring-yellow-400 
-                                text-white placeholder-white backdrop-blur-sm"
-                        >
-                    </div>
 
-                    <!-- Carnet -->
-                    <div>
-                        <label class="block font-semibold mb-1">Carnet *</label>
-                        <p v-if="errors.carnet" class="text-red-700 dark:text-red-300 text-sm mb-1">{{ errors.carnet }}</p>
-
-                        <input
-                            v-model="form.carnet"
-                            type="text"
-                            class="w-full bg-white/80 dark:bg-black/40 border border-gray-300 dark:border-gray-600
-                                px-4 py-3 rounded-md focus:ring-2 focus:ring-yellow-400 
-                                text-white placeholder-white backdrop-blur-sm"
-                        >
-                    </div>
-
-                    <!-- Teléfono -->
-                    <div>
-                        <label class="block font-semibold mb-1">Teléfono *</label>
-                        <p v-if="errors.telefono" class="text-red-700 dark:text-red-300 text-sm mb-1">{{ errors.telefono }}</p>
-
-                        <input
-                            v-model="form.telefono"
-                            type="text"
-                            class="w-full bg-white/80 dark:bg-black/40 border border-gray-300 dark:border-gray-600
-                                px-4 py-3 rounded-md focus:ring-2 focus:ring-yellow-400 
-                                text-white placeholder-white backdrop-blur-sm"
-                        >
-                    </div>
-
-                    <!-- Mensaje -->
-                    <div>
-                        <label class="block font-semibold mb-1">Mensaje *</label>
-                        <p v-if="errors.mensaje" class="text-red-700 dark:text-red-300 text-sm mb-1">{{ errors.mensaje }}</p>
-
-                        <textarea
-                            v-model="form.mensaje"
-                            rows="5"
-                            class="w-full bg-white/80 dark:bg-black/40 border border-gray-300 dark:border-gray-600
-                                px-4 py-3 rounded-md focus:ring-2 focus:ring-yellow-400 
-                                text-white placeholder-white backdrop-blur-sm"
-                        ></textarea>
-                    </div>
-
-                    <button
-                        type="submit"
-                        class="bg-yellow-500 text-black dark:text-white dark:bg-yellow-600 
-                            font-bold px-10 py-3 rounded-md hover:bg-yellow-400 
-                            dark:hover:bg-yellow-500 transition w-full text-center mt-4"
-                    >
-                        Contactar
-                    </button>
-                </form>
-            </div>
 
             <!-- TEXTO LATERAL EN UNA TARJETA CAFÉ -->
                 <div class="flex flex-col">
 
                 <!-- Cuadro del texto -->
-            <div 
-                    class="bg-[#bfa78c]/90 dark:bg-[#5c4a3b]/80 
-                        p-8 rounded-2xl shadow-xl backdrop-blur-md 
-                        border border-[#a38b73] dark:border-[#8b7a61] 
-                        w-fit max-w-lg"
-                >
-                    <h3 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-                        Contáctanos
-                    </h3>
+<div
+    class="w-full p-5 sm:p-8 rounded-2xl shadow-xl backdrop-blur-xl
+        bg-[#FFFFFF]/90 border border-[#E1E5EB]
+        dark:bg-[#112544]/80 dark:border-[#1f2a44]
+        sm:max-w-lg
+        hover:shadow-[0_6px_25px_rgba(0,0,0,0.15)]
+        dark:hover:shadow-[0_6px_25px_rgba(0,0,0,0.45)]
+        transition text-center sm:text-left"
+>
+    <h3 class="text-2xl font-bold mb-4"
+        :class="['leading-tight', 'text-[#2c2c2c] dark:text-white']">
+        Contáctanos
+    </h3>
 
-                <p class="mb-4 text-gray-900 dark:text-gray-200">
-                    ¿Desea más información de nuestros servicios o desea buscar una Oficina
-                    que le atienda? Envíenos un correo con sus datos para referirlo.
-                </p>
+    <p class="mb-4 text-base"
+        :class="['text-gray-700 dark:text-gray-200']">
+        ¿Desea más información de nuestros servicios o desea buscar una Oficina que le atienda?
+        Envíenos un correo con sus datos para referirlo.
+    </p>
 
-                <p class="font-bold text-yellow-800 dark:text-yellow-400">Línea de soporte</p>
-                <p class="text-gray-900 dark:text-gray-200">
-                    Nuestra asistencia telefónica es de Lunes a Viernes, de 8:00 a 17:00 hrs
-                </p>
-            </div>
+    <p class="font-semibold mb-1"
+        :class="['text-[#2c2c2c] dark:text-yellow-400']">
+        Línea de soporte
+    </p>
+
+    <p class="text-sm"
+        :class="['text-gray-700 dark:text-gray-200']">
+        Nuestra asistencia telefónica es de Lunes a Viernes, de 8:00 a 17:00 hrs
+    </p>
+</div>
+
+
 
             <!-- BLOQUE DE ÉXITO ABAJO DEL CUADRO -->
             <div
@@ -250,5 +252,14 @@ const handleSubmit = () => {
 
 .animate-fade-in {
     animation: fade-in 0.4s ease-out forwards;
+}
+
+.fade-up {
+animation: fade-up .5s ease-out forwards;
+}
+
+@keyframes fade-up {
+0% { opacity: 0; transform: translateY(20px); }
+100% { opacity: 1; transform: translateY(0); }
 }
 </style>

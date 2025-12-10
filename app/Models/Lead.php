@@ -117,6 +117,20 @@ class Lead extends BaseModel
         'salutation' => Salutation::class,
     ];
 
+    protected $fillable = [
+    'client_name',
+    'client_email',
+    'numero1',       // ya que tú realmente estabas usando este
+    'carnet',
+    'note',
+    'source_id',
+    'status_id',
+    'column_priority',
+    'added_by',
+    'company_id'
+];
+
+
     public function getImageUrlAttribute()
     {
         $gravatarHash = !is_null($this->email) ? md5(strtolower(trim($this->email))) : '';
