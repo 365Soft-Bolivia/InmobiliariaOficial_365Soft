@@ -189,7 +189,7 @@ if (typeof window !== 'undefined') {
     <!-- Galería -->
     <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       <div
-        v-for="image in images"
+        v-for="image in images.filter(img => img.is_primary)"
         :key="image.id"
         class="group relative aspect-square cursor-pointer overflow-hidden rounded-xl bg-gray-100 shadow-md transition-all duration-300 hover:shadow-2xl dark:bg-gray-800"
       >
@@ -423,7 +423,7 @@ if (typeof window !== 'undefined') {
             </svg>
           </button>
 
-          <div v-if="images.length > 1" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+          <!-- <div v-if="images.length > 1" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
             <div class="mx-auto flex max-w-4xl gap-3 overflow-x-auto pb-2">
               <button
                 v-for="(image, index) in images"
@@ -443,7 +443,7 @@ if (typeof window !== 'undefined') {
                 <div v-if="image.id === selectedImage.id" class="absolute inset-0 bg-white/20"></div>
               </button>
             </div>
-          </div>
+          </div> -->
         </div>
       </Transition>
     </Teleport>
