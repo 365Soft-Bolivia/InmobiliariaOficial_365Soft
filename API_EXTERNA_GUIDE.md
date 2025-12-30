@@ -51,9 +51,12 @@ Agrega las siguientes variables a tu archivo `.env`:
 
 ```env
 EXTERNAL_API_URL=https://fifusa.site/api/v1/products
+EXTERNAL_API_KEY= 
 EXTERNAL_API_CACHE_DURATION=300
 EXTERNAL_API_TIMEOUT=30
 ```
+
+⚠️ **IMPORTANTE**: La API ahora requiere autenticación mediante el header `X-API-KEY`. Sin esta clave, la API retornará un error 401 con el mensaje: "API Key requerida. Incluir en header X-API-KEY."
 
 ### Configuración por Defecto
 
@@ -62,10 +65,43 @@ El sistema ya incluye configuraciones por defecto en `config/services.php`:
 ```php
 'external_api' => [
     'url' => env('EXTERNAL_API_URL', 'https://fifusa.site/api/v1/products'),
+    'key' => env('EXTERNAL_API_KEY', ''),
     'cache_duration' => env('EXTERNAL_API_CACHE_DURATION', 300), // 5 minutos
     'timeout' => env('EXTERNAL_API_TIMEOUT', 30),
 ],
 ```
+
+## 🔐 Autenticación
+
+### Header X-API-KEY
+
+La API externa ahora requiere autenticación mediante un header HTTP personalizado:
+
+```
+X-API-KEY: 68d382c6-63fb-4736-9669-f4e230efb2e1
+```
+
+Esta clave se configura automáticamente en el archivo `.env` y es utilizada por el servicio `ExternalApiService` en todas las peticiones a la API.
+
+### Implementación en el Servicio
+
+El servicio `ExternalApiService` incluye automáticamente el header en todas las peticiones:
+
+```php
+$response = Http::timeout(30)
+    ->withHeaders([
+        'X-API-KEY' => $this->apiKey,
+        'Accept' => 'application/json',
+    ])
+    ->get($url);
+```
+
+### Seguridad
+
+- **Nunca compartir la API Key** públicamente o en repositorios públicos
+- **Rotación de claves**: Si la clave es comprometida, solicitar una nueva al proveedor de la API
+- **Ambientes**: Usar claves diferentes para desarrollo y producción
+- **Logs**: El sistema NO incluye la API Key en los logs por seguridad
 
 ## 🛠️ Rutas Disponibles
 
@@ -189,9 +225,20 @@ Para reemplazar completamente las rutas originales:
 El sistema incluye manejo de errores robusto:
 
 - **Timeout**: 30 segundos por defecto
+- **Fallos de autenticación**: Error 401 si la API Key es inválida o está ausente
 - **Fallos de API**: Mensaje de error amigable al usuario
 - **Datos inválidos**: Validación y formateo seguro
 - **Fallback**: Opción de mostrar mensaje de error personalizado
+
+### Errores Comunes
+
+| Código HTTP | Descripción | Solución |
+|-------------|-------------|----------|
+| 401 | API Key requerida o inválida | Verificar que `EXTERNAL_API_KEY` esté configurada correctamente en `.env` |
+| 403 | API Key sin permisos | Contactar al administrador de la API externa |
+| 404 | Recurso no encontrado | Verificar que el ID del producto exista |
+| 500 | Error interno del servidor | Reintentar más tarde o contactar soporte |
+| 503 | Servicio no disponible | La API externa está temporalmente fuera de servicio |
 
 ## 📝 Notas de Desarrollo
 

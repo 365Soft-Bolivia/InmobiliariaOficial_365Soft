@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
     BedDouble,
     Bath,
@@ -16,6 +16,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import publicRoutes from '@/routes/public';
+import { useImageUrl } from '@/composables/useImageUrl';
 
 interface Props {
     propiedad: {
@@ -33,6 +34,7 @@ interface Props {
         superficie_util?: number;
         direccion?: string;
         imagen_principal?: string | null;
+        imagen_portada?: string | null;  // Para compatibilidad con API externa
         descripcion?: string;
         antiguedad?: number;
         is_public?: boolean;
@@ -55,6 +57,24 @@ const emits = defineEmits<{
     favorite: [id: number];
     share: [propiedad: Props['propiedad']];
 }>();
+
+// Composables
+const { getImageUrl } = useImageUrl();
+
+// Estado para cargar imágenes
+const imageLoaded = ref(false);
+const imageError = ref(false);
+
+// Computed property para obtener la imagen correcta (soporta ambos campos)
+const propiedadImage = computed(() => {
+    return props.propiedad.imagen_portada || props.propiedad.imagen_principal || null;
+});
+
+// Watch para resetear el estado de carga cuando cambia la imagen
+watch(propiedadImage, () => {
+    imageLoaded.value = false;
+    imageError.value = false;
+});
 
 // Computed properties
 const formatPrice = (price: string | number) => {
@@ -89,13 +109,6 @@ const getOperacionLabel = (operacion: string) => {
     return labels[operacion.toLowerCase()] || operacion;
 };
 
-const getPropertyImage = (imagePath: string | null) => {
-    if (!imagePath) {
-        return 'data:image/svg+xml,%3Csvg width="400" height="300" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="400" height="300" fill="%23f3f4f6"/%3E%3Cg fill="%239ca3af"%3E%3Crect x="150" y="100" width="100" height="80" rx="4"/%3E%3Crect x="120" y="190" width="40" height="30" rx="2"/%3E%3Crect x="170" y="190" width="40" height="30" rx="2"/%3E%3Crect x="220" y="190" width="40" height="30" rx="2"/%3E%3Cpolygon points="200,60 220,100 180,100"/%3E%3C/g%3E%3Ctext x="200" y="250" text-anchor="middle" fill="%236b7280" font-family="Arial" font-size="14"%3ESin imagen%3C/text%3E%3C/svg%3E';
-    }
-    return `/storage/${imagePath}`;
-};
-
 const cardSizeClasses = computed(() => {
     switch (props.size) {
         case 'sm':
@@ -128,14 +141,42 @@ const imageHeightClasses = computed(() => {
         data-testid="property-card"
     >
         <!-- Imagen principal -->
-        <div class="relative overflow-hidden" :class="imageHeightClasses">
+        <div class="relative overflow-hidden bg-gray-200" :class="imageHeightClasses">
+            <!-- Skeleton de carga -->
+            <div
+                v-if="!imageLoaded && !imageError"
+                class="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-300 to-gray-200 animate-pulse"
+            >
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <Home class="w-12 h-12 text-gray-400" />
+                </div>
+            </div>
+
+            <!-- Imagen -->
             <img
-                :src="getPropertyImage(propiedad.imagen_principal)"
+                :src="getImageUrl(propiedadImage)"
                 :alt="propiedad.name"
                 :loading="lazy ? 'lazy' : 'eager'"
-                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                :class="{ 'blur-sm': !propiedad.imagen_principal }"
+                class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                :class="{
+                    'blur-sm': !propiedadImage,
+                    'opacity-0': !imageLoaded,
+                    'opacity-100': imageLoaded
+                }"
+                @load="imageLoaded = true"
+                @error="imageError = true"
             >
+
+            <!-- Placeholder de error -->
+            <div
+                v-if="imageError"
+                class="absolute inset-0 bg-gray-100 flex items-center justify-center"
+            >
+                <div class="text-center text-gray-400">
+                    <Home class="w-12 h-12 mx-auto mb-2" />
+                    <span class="text-sm">Imagen no disponible</span>
+                </div>
+            </div>
 
             <!-- Overlay para badges y acciones -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">

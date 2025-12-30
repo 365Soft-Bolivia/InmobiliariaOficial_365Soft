@@ -37,6 +37,7 @@ return [
 
     'external_api' => [
         'url' => env('EXTERNAL_API_URL', 'https://fifusa.site/api/v1/products'),
+        'key' => env('EXTERNAL_API_KEY', ''),
         'cache_duration' => env('EXTERNAL_API_CACHE_DURATION', 300), // 5 minutos
         'timeout' => env('EXTERNAL_API_TIMEOUT', 30),
     ],

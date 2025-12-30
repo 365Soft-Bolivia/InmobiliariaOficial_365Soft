@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Pagination from '@/components/public/Pagination.vue';
 import publicRoutes from '@/routes/public';
+import { useImageUrl } from '@/composables/useImageUrl';
+
+const { getImageUrl } = useImageUrl();
 
 
 interface ProductImage {
@@ -76,13 +79,6 @@ const getSortedImages = (propiedad: Product) => {
         return a.order - b.order;
     });
 };
-
-// Helper para obtener URL de imagen
-const getImageUrl = (imagePath: string) => {
-    return `/storage/${imagePath}`;
-};
-
-
 
 // Lógica de navegación de imágenes para cada propiedad
 const favoriteProperties = ref<Set<number>>(new Set());

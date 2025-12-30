@@ -10,8 +10,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNotification } from '@/composables/useNotification';
+import { useImageUrl } from '@/composables/useImageUrl';
 
 const { showSuccess, showError } = useNotification();
+const { getImageUrl } = useImageUrl();
 
 interface ProductImage {
     id: number;
@@ -74,8 +76,6 @@ const sortedImages = computed(() => {
         return a.order - b.order;
     });
 });
-
-const getImageUrl = (imagePath: string) => `/storage/${imagePath}`;
 
 const nextImage = () => {
     if (!sortedImages.value.length) return;

@@ -9,11 +9,13 @@ use Illuminate\Http\Request;
 class ExternalApiService
 {
     private string $apiUrl;
+    private string $apiKey;
     private int $cacheDuration;
 
     public function __construct()
     {
         $this->apiUrl = config('services.external_api.url', 'https://fifusa.site/api/v1/products');
+        $this->apiKey = config('services.external_api.key', '');
         $this->cacheDuration = config('services.external_api.cache_duration', 300); // 5 minutos por defecto
     }
 
@@ -44,7 +46,12 @@ class ExternalApiService
                 }
             }
 
-            $response = Http::timeout(30)->get($url);
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'X-API-KEY' => $this->apiKey,
+                    'Accept' => 'application/json',
+                ])
+                ->get($url);
 
             if (!$response->successful()) {
                 throw new \Exception('Error al consumir la API externa: ' . $response->status());
@@ -72,7 +79,12 @@ class ExternalApiService
         $cacheKey = "external_product_{$id}";
 
         return Cache::remember($cacheKey, $this->cacheDuration, function () use ($id) {
-            $response = Http::timeout(30)->get("{$this->apiUrl}/{$id}");
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'X-API-KEY' => $this->apiKey,
+                    'Accept' => 'application/json',
+                ])
+                ->get("{$this->apiUrl}/{$id}");
 
             if (!$response->successful()) {
                 return null;
