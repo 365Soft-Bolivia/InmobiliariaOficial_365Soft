@@ -51,6 +51,10 @@ class ExternalPropertyFilterService
             'habitaciones',
             'banos',
             'cocheras',
+            'superficie_construida_min',
+            'superficie_construida_max',
+            'superficie_terreno_min',
+            'superficie_terreno_max',
             'per_page',
         ]);
     }

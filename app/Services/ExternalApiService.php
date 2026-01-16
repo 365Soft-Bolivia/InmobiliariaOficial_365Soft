@@ -112,18 +112,39 @@ class ExternalApiService
         $filtered = collect($allProducts['products']);
 
         // Aplicar filtros localmente
+
+        // Filtro de categorías (soporta múltiples IDs separados por coma)
         if ($request->get('categoria')) {
-            $categoryName = $request->get('categoria');
-            $filtered = $filtered->filter(function ($product) use ($categoryName) {
-                return strcasecmp($product['category_name'], $categoryName) === 0;
-            });
+            $categoriaValue = $request->get('categoria');
+
+            // Si es un string con comas, es una lista de IDs
+            if (is_string($categoriaValue) && str_contains($categoriaValue, ',')) {
+                $categoryIds = array_map('intval', explode(',', $categoriaValue));
+                $filtered = $filtered->filter(function ($product) use ($categoryIds) {
+                    return in_array($product['category_id'], $categoryIds);
+                });
+            } else {
+                // Single category ID
+                $categoryId = (int) $categoriaValue;
+                $filtered = $filtered->where('category_id', $categoryId);
+            }
         }
 
+        // Filtro de operaciones (soporta múltiples operaciones separadas por coma)
         if ($request->get('operacion')) {
-            $operacion = $request->get('operacion');
-            $filtered = $filtered->where('operacion', $operacion);
+            $operacionValue = $request->get('operacion');
+
+            if (is_string($operacionValue) && str_contains($operacionValue, ',')) {
+                $operaciones = explode(',', $operacionValue);
+                $filtered = $filtered->filter(function ($product) use ($operaciones) {
+                    return in_array($product['operacion'], $operaciones);
+                });
+            } else {
+                $filtered = $filtered->where('operacion', $operacionValue);
+            }
         }
 
+        // Filtro por código de inmueble
         if ($request->get('codigo')) {
             $codigo = $request->get('codigo');
             $filtered = $filtered->filter(function ($product) use ($codigo) {
@@ -131,6 +152,7 @@ class ExternalApiService
             });
         }
 
+        // Filtro de rango de precios
         if ($request->get('precio_min')) {
             $minPrice = (float) $request->get('precio_min');
             $filtered = $filtered->where('price', '>=', $minPrice);
@@ -141,6 +163,7 @@ class ExternalApiService
             $filtered = $filtered->where('price', '<=', $maxPrice);
         }
 
+        // Filtros de características
         if ($request->get('ambientes')) {
             $ambientes = (int) $request->get('ambientes');
             $filtered = $filtered->where('ambientes', $ambientes);
@@ -159,6 +182,40 @@ class ExternalApiService
         if ($request->get('cocheras')) {
             $cocheras = (int) $request->get('cocheras');
             $filtered = $filtered->where('cocheras', $cocheras);
+        }
+
+        // Filtros de superficies (superficie_construida)
+        if ($request->get('superficie_construida_min')) {
+            $minSuperficie = (float) $request->get('superficie_construida_min');
+            $filtered = $filtered->filter(function ($product) use ($minSuperficie) {
+                return $product['superficie_construida'] !== null
+                    && $product['superficie_construida'] >= $minSuperficie;
+            });
+        }
+
+        if ($request->get('superficie_construida_max')) {
+            $maxSuperficie = (float) $request->get('superficie_construida_max');
+            $filtered = $filtered->filter(function ($product) use ($maxSuperficie) {
+                return $product['superficie_construida'] !== null
+                    && $product['superficie_construida'] <= $maxSuperficie;
+            });
+        }
+
+        // Filtros de superficie_util (superficie_terreno en el frontend)
+        if ($request->get('superficie_terreno_min')) {
+            $minSuperficie = (float) $request->get('superficie_terreno_min');
+            $filtered = $filtered->filter(function ($product) use ($minSuperficie) {
+                return $product['superficie_util'] !== null
+                    && $product['superficie_util'] >= $minSuperficie;
+            });
+        }
+
+        if ($request->get('superficie_terreno_max')) {
+            $maxSuperficie = (float) $request->get('superficie_terreno_max');
+            $filtered = $filtered->filter(function ($product) use ($maxSuperficie) {
+                return $product['superficie_util'] !== null
+                    && $product['superficie_util'] <= $maxSuperficie;
+            });
         }
 
         // Aplicar paginación local
@@ -192,14 +249,28 @@ class ExternalApiService
             $products = $this->getProducts();
             $productCollection = collect($products['products']);
 
-            $categorias = $productCollection
-                ->pluck('category_name')
-                ->filter()
-                ->unique()
-                ->sort()
-                ->values()
-                ->toArray();
+            // Obtener categorías únicas con sus IDs
+            $categoriasConIds = $productCollection
+                ->filter(function ($product) {
+                    return isset($product['category_id']) && isset($product['category_name']);
+                })
+                ->map(function ($product) {
+                    return [
+                        'id' => $product['category_id'],
+                        'name' => $product['category_name'],
+                    ];
+                })
+                ->unique('id')
+                ->sortBy('name')
+                ->values();
 
+            // Crear array asociativo con ID como clave
+            $categoriasAsociativas = [];
+            foreach ($categoriasConIds as $categoria) {
+                $categoriasAsociativas[$categoria['id']] = $categoria['name'];
+            }
+
+            // Obtener operaciones únicas
             $operaciones = $productCollection
                 ->pluck('operacion')
                 ->filter()
@@ -207,12 +278,6 @@ class ExternalApiService
                 ->sort()
                 ->values()
                 ->toArray();
-
-            // Crear un array asociativo con nombre como clave y valor
-            $categoriasAsociativas = [];
-            foreach ($categorias as $categoria) {
-                $categoriasAsociativas[$categoria] = $categoria;
-            }
 
             // Crear array asociativo para operaciones
             $operacionesAsociativas = [];
