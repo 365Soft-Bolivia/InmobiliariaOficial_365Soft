@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { disable, enable, show } from '@/routes/admin/two-factor';
+import twoFactor from '@/routes/admin/two-factor';
+// import { disable, enable } from '@/routes/admin/two-factor'; // TODO: Rutas no implementadas
 import { BreadcrumbItem } from '@/types';
 import { Form, Head } from '@inertiajs/vue3';
 import { ShieldBan, ShieldCheck } from 'lucide-vue-next';
@@ -26,7 +27,7 @@ withDefaults(defineProps<Props>(), {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Autenticacion de dos factores',
-        href: show.url(),
+        href: twoFactor.show.url(),
     },
 ];
 
@@ -68,15 +69,12 @@ onUnmounted(() => {
                         >
                             <ShieldCheck />Continuar configuración
                         </Button>
-                        <Form
+                        <!-- TODO: enable.form() no implementado -->
+                        <Button
                             v-else
-                            v-bind="enable.form()"
-                            @success="showSetupModal = true"
-                            #default="{ processing }"
+                            @click="showSetupModal = true"
                         >
-                            <Button type="submit" :disabled="processing">
-                                <ShieldCheck />Habilitar 2FA</Button
-                            ></Form
+                            <ShieldCheck />Habilitar 2FA (Demo)</Button
                         >
                     </div>
                 </div>
@@ -97,16 +95,14 @@ onUnmounted(() => {
                     <TwoFactorRecoveryCodes />
 
                     <div class="relative inline">
-                        <Form v-bind="disable.form()" #default="{ processing }">
-                            <Button
-                                variant="destructive"
-                                type="submit"
-                                :disabled="processing"
-                            >
-                                <ShieldBan />
-                                Deshabilitar 2FA
-                            </Button>
-                        </Form>
+                        <!-- TODO: disable.form() no implementado -->
+                        <Button
+                            variant="destructive"
+                            disabled
+                        >
+                            <ShieldBan />
+                            Deshabilitar 2FA (No disponible)
+                        </Button>
                     </div>
                 </div>
 

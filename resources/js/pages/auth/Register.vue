@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
-import { login } from '@/routes';
+// import { login } from '@/routes'; // TODO: usar URL directa hasta que login esté en routes
 import { Form, Head } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 </script>
@@ -100,7 +100,7 @@ import { LoaderCircle } from 'lucide-vue-next';
             <div class="text-center text-sm text-muted-foreground">
                 Already have an account?
                 <TextLink
-                    :href="login()"
+                    href="/admin/login"
                     class="underline underline-offset-4"
                     :tabindex="6"
                     >Log in</TextLink
