@@ -138,6 +138,14 @@ Las migraciones se ejecutarán automáticamente durante el despliegue.
 2. Visita la URL para verificar que la aplicación funciona
 3. Revisa los logs en **Logs** → **Deploy Logs** para ver si hay errores
 
+> **Nota**: Si obtienes un error sobre rutas duplicadas (`route:cache`), ejecuta localmente:
+> ```bash
+> php artisan route:clear
+> php artisan route:cache
+> ```
+>
+> Si el error persiste, el archivo [routes/accesos.php](routes/accesos.php) fue limpiado para eliminar rutas duplicadas.
+
 ---
 
 ## 🔧 Troubleshooting
