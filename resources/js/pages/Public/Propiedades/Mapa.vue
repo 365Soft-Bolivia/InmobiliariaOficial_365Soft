@@ -109,6 +109,11 @@ const nombreCategoriaSeleccionada = computed(() => {
 });
 
 const getImageUrl = (imagePath: string) => {
+    // Si es una URL externa (http/https), devolverla tal cual
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+    }
+    // Si es un path local, usar storage
     return `/storage/${imagePath}`;
 };
 
@@ -464,7 +469,14 @@ const updateMarkers = () => {
             ? product.images.sort((a, b) => (a.is_primary ? -1 : 1))
             : [];
 
-        const imageUrl = (path: string) => `/storage/${path}`;
+        const imageUrl = (path: string) => {
+            // Si es una URL externa (http/https), devolverla tal cual
+            if (path.startsWith('http://') || path.startsWith('https://')) {
+                return path;
+            }
+            // Si es un path local, usar storage
+            return `/storage/${path}`;
+        };
         const hasImages = images.length > 0;
 
         const firstImage = hasImages ? imageUrl(images[0].image_path) : null;

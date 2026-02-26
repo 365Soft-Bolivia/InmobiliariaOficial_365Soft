@@ -101,7 +101,7 @@ public function store(Request $request, int $productId)
     {
         try {
             $product = Product::findOrFail($productId);
-            
+
             // Verificar que la imagen existe y pertenece al producto
             $image = ProductImage::where('product_id', $productId)
                 ->where('id', $imageId)
@@ -110,7 +110,7 @@ public function store(Request $request, int $productId)
             // Remover el flag de principal de todas las imágenes del producto
             ProductImage::where('product_id', $productId)
                 ->update(['is_primary' => false]);
-            
+
             // Establecer la nueva imagen principal
             $image->update(['is_primary' => true]);
 
@@ -128,6 +128,45 @@ public function store(Request $request, int $productId)
     }
 
     /**
+     * Agregar imagen desde URL externa (para demo en Railway)
+     */
+    public function storeFromUrl(Request $request, int $productId)
+    {
+        try {
+            $product = Product::findOrFail($productId);
+
+            $request->validate([
+                'url' => 'required|url',
+                'is_primary' => 'nullable|boolean',
+            ]);
+
+            $isPrimary = $request->get('is_primary', false);
+            $isFirstImage = $product->images()->count() === 0;
+
+            $productImage = ProductImage::create([
+                'product_id' => $productId,
+                'image_path' => $request->url,
+                'original_name' => 'imagen_externa_' . time(),
+                'is_primary' => $isPrimary || ($isFirstImage),
+                'order' => $product->images()->count(),
+            ]);
+
+            return back()->with([
+                'success' => 'Imagen externa agregada correctamente.',
+                'uploaded' => [[
+                    'id' => $productImage->id,
+                    'image_path' => $productImage->image_path,
+                    'is_primary' => $productImage->is_primary,
+                ]],
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error agregando imagen externa: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Error al agregar imagen externa: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
      * Eliminar imagen
      */
     public function destroy(int $productId, int $imageId)
@@ -140,15 +179,19 @@ public function store(Request $request, int $productId)
 
             $wasPrimary = $image->is_primary;
             $imagePath = $image->image_path;
-            
-            // Eliminar archivo físico si existe
-            if (Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
-                Log::info("Archivo eliminado: {$imagePath}");
+
+            // Solo eliminar archivo físico si NO es una URL externa
+            if (!str_starts_with($imagePath, 'http')) {
+                if (Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                    Log::info("Archivo eliminado: {$imagePath}");
+                } else {
+                    Log::warning("Archivo no encontrado: {$imagePath}");
+                }
             } else {
-                Log::warning("Archivo no encontrado: {$imagePath}");
+                Log::info("Imagen externa no se elimina (URL): {$imagePath}");
             }
-            
+
             // Eliminar registro de la base de datos
             $image->delete();
             Log::info("Imagen {$imageId} eliminada de producto {$productId}");
@@ -158,7 +201,7 @@ public function store(Request $request, int $productId)
                 $newPrimary = ProductImage::where('product_id', $productId)
                     ->orderBy('order')
                     ->first();
-                
+
                 if ($newPrimary) {
                     $newPrimary->update(['is_primary' => true]);
                     Log::info("Nueva imagen principal: {$newPrimary->id}");

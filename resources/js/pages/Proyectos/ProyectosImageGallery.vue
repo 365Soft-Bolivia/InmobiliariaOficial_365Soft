@@ -31,6 +31,11 @@ const showPrimaryConfirm = ref(false);
 const imageToPrimary = ref<number | null>(null);
 
 const getImageUrl = (imagePath: string) => {
+  // Si es una URL externa (http/https), devolverla tal cual
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  // Si es un path local, usar storage
   return `/storage/${imagePath}`;
 };
 

@@ -142,24 +142,78 @@ class Product extends BaseModel
         });
     }
 
+    /**
+     * Obtiene la URL de la imagen del producto
+     * Prioridad: 1) Imagen primaria de galería, 2) Primera imagen, 3) default_image, 4) Placeholder
+     */
     public function getImageUrlAttribute()
     {
-        if (app()->environment(['development', 'demo']) && str_contains($this->default_image, 'http')) {
-            return $this->default_image;
+        // 1. Buscar imagen primaria en la galería
+        $primaryImage = $this->images()->where('is_primary', true)->first();
+        if ($primaryImage && $primaryImage->image_path) {
+            // Si es una URL externa, devolverla tal cual
+            if (str_starts_with($primaryImage->image_path, 'http')) {
+                return $primaryImage->image_path;
+            }
+            // Si es un path local, intentar usar Storage
+            try {
+                if (\Storage::disk('public')->exists($primaryImage->image_path)) {
+                    return \Storage::url($primaryImage->image_path);
+                }
+            } catch (\Exception $e) {
+                // Fallar silenciosamente y continuar
+            }
         }
 
-        return ($this->default_image) ? asset_url_local_s3(Product::FILE_PATH . '/' . $this->default_image) : '';
+        // 2. Buscar primera imagen de la galería
+        $firstImage = $this->images()->first();
+        if ($firstImage && $firstImage->image_path) {
+            if (str_starts_with($firstImage->image_path, 'http')) {
+                return $firstImage->image_path;
+            }
+            try {
+                if (\Storage::disk('public')->exists($firstImage->image_path)) {
+                    return \Storage::url($firstImage->image_path);
+                }
+            } catch (\Exception $e) {
+                // Fallar silenciosamente y continuar
+            }
+        }
+
+        // 3. Usar default_image si existe
+        if ($this->default_image) {
+            if (str_starts_with($this->default_image, 'http')) {
+                return $this->default_image;
+            }
+            try {
+                if (\Storage::disk('public')->exists(Product::FILE_PATH . '/' . $this->default_image)) {
+                    return asset_url_local_s3(Product::FILE_PATH . '/' . $this->default_image);
+                }
+            } catch (\Exception $e) {
+                // Fallar silenciosamente y continuar
+            }
+        }
+
+        // 4. IMÁGENES POR DEFECTO DE UNSPLASH (para demo en Railway)
+        $placeholders = [
+            'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop&q=80', // Casa moderna
+            'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&auto=format&fit=crop&q=80', // Apartamento
+            'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80', // Penthouse
+            'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop&q=80', // Mansión lujosa
+            'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80', // Villa
+            'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&auto=format&fit=crop&q=80', // Casa con piscina
+        ];
+
+        // Usar el ID del producto para elegir una imagen consistente
+        return $placeholders[$this->id % count($placeholders)];
     }
 
+    /**
+     * Obtiene la imagen del producto (para compatibilidad)
+     */
     public function getImageAttribute()
     {
-        if ($this->default_image) {
-            return str($this->default_image)->contains('http')
-                ? $this->default_image
-                : (Product::FILE_PATH . '/' . $this->default_image);
-        }
-
-        return $this->default_image;
+        return $this->getImageUrlAttribute();
     }
 
     public function getDownloadFileUrlAttribute()

@@ -31,14 +31,21 @@ class ProductImage extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // ✅ Eliminar archivo físico al borrar el registro
+    // ✅ Eliminar archivo físico al borrar el registro (solo locales, no URLs externas)
     protected static function boot()
     {
         parent::boot();
 
         static::deleting(function ($image) {
-            if (Storage::disk('public')->exists($image->image_path)) {
-                Storage::disk('public')->delete($image->image_path);
+            // Solo intentar eliminar si NO es una URL externa
+            if (!str_starts_with($image->image_path, 'http')) {
+                try {
+                    if (Storage::disk('public')->exists($image->image_path)) {
+                        Storage::disk('public')->delete($image->image_path);
+                    }
+                } catch (\Exception $e) {
+                    // Silenciar error si no se puede acceder al storage (Railway)
+                }
             }
         });
     }
