@@ -5,7 +5,7 @@ export type Appearance = 'light' | 'dark' | 'system';
 const APPEARANCE_KEY = 'appearance';
 
 // Estado reactivo compartido entre todas las instancias
-const appearance = ref<Appearance>('system');
+const appearance = ref<Appearance>('light'); // Tema claro por defecto
 let isInitialized = false;
 let mediaQuery: MediaQueryList | null = null;
 let mediaQueryHandler: (() => void) | null = null;
@@ -83,9 +83,9 @@ export function useAppearance() {
 // Función de inicialización que se ejecuta antes de montar Vue
 export function initializeTheme() {
     if (typeof window === 'undefined') return;
-    
+
     const savedAppearance = localStorage.getItem(APPEARANCE_KEY) as Appearance | null;
-    const currentAppearance = savedAppearance || 'system';
+    const currentAppearance = savedAppearance || 'light'; // Tema claro por defecto
     
     const effectiveAppearance = currentAppearance === 'system' 
         ? getSystemAppearance() 
