@@ -2,8 +2,6 @@
 # Docker Compose Producción - Inmobiliaria 365Soft
 # ==============================================
 
-version: '3.8'
-
 services:
   app:
     build: .
