@@ -1,0 +1,59 @@
+# Git
+.git
+.gitattributes
+.gitignore
+
+# Docker
+Dockerfile
+Dockerfile.dev
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+*.md
+CHANGELOG.md
+LICENSE
+
+# IDE
+.vscode
+.idea
+*.sublime*
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Laravel
+/tests
+/storage/*.key
+/vendor
+.env.example
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+
+# Build artifacts
+public/build
+public/hot
+public/storage
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Misc
+.nixpacks.toml
+deployment/local/*
+*.log
+*.sql
+!.sql
+*.sqlite
+!.sqlite
+
+# Claude
+.claude
