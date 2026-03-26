@@ -53,14 +53,15 @@ RUN echo "memory_limit=256M" > /usr/local/etc/php/conf.d/custom.ini \
 
 # Copiar archivos de dependencias primero
 COPY composer.json composer.lock ./
-COPY package.json ./
 
-# Instalar dependencias (sin scripts para evitar error de artisan)
+# Instalar dependencias PHP (sin scripts para evitar error de artisan)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
-RUN npm install && npm run build
 
-# Copiar resto del proyecto (aquí ya existe artisan)
+# Copiar todo el proyecto (aquí ya existe artisan y los archivos para build)
 COPY . .
+
+# Instalar dependencias Node y compilar assets
+RUN npm install && npm run build
 
 # Ejecutar scripts que requieren artisan
 RUN composer dump-autoload --optimize \
