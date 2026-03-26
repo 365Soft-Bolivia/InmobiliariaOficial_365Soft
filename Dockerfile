@@ -52,11 +52,11 @@ RUN echo "memory_limit=256M" > /usr/local/etc/php/conf.d/custom.ini \
 
 # Copiar archivos de dependencias primero
 COPY composer.json composer.lock ./
-COPY package.json package-lock.json ./
+COPY package.json ./
 
 # Instalar dependencias
 RUN composer install --no-dev --optimize-autoloader --no-interaction
-RUN npm ci && npm run build
+RUN npm install && npm run build
 
 # Copiar resto del proyecto
 COPY . .
