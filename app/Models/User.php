@@ -28,6 +28,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticationProvider;
 // use Trebol\Entrust\Traits\EntrustUserTrait;
 use App\Helper\UserService;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * App\Models\User
@@ -221,11 +222,12 @@ use App\Helper\UserService;
 class User extends BaseModel implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
 {
 
-    use Notifiable, 
+    use Notifiable,
     // EntrustUserTrait,
      Authenticatable, Authorizable, CanResetPassword, HasFactory, TwoFactorAuthenticatable;
     use HasCompany;
     use HasMaskImage;
+    use HasRoles; // Spatie Permission trait
     // use UseDevices;
 
 
@@ -245,7 +247,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     //        'company:id,company_name',
     //        'roles:name,display_name',
        'session:id',
-       'clientContact'
+       //'clientContact' // Comentado: tabla client_contacts no existe en el sistema
     ];
 
     /**
@@ -1249,16 +1251,24 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     {
         return $this->belongsToMany(TicketReply::class, 'ticket_reply_users', 'user_id', 'ticket_reply_id');
     }
+
+// Las siguientes funciones están comentadas porque Spatie Permission ya las proporciona
+// a través del trait HasRoles que usa las tablas correctas (model_has_roles)
+/*
 public function roles()
 {
     return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
 }
+*/
 
 public function getMainRoleAttribute()
 {
+    // Usar la función roles() proporcionada por Spatie Permission
     return $this->roles->first();
 }
 
+/*
+// Spatie Permission ya proporciona esta función
 public function hasRole($role)
 {
     if (is_string($role)) {
@@ -1266,4 +1276,5 @@ public function hasRole($role)
     }
     return false;
 }
+*/
 }

@@ -6,33 +6,69 @@ use App\Models\ProductImage;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Intervention\Image\Facades\Image;
+
 
 class ProductImageController extends Controller
 {
-    public function store(Request $request, int $productId)
-    {
+    /**
+     * Subir nuevas imágenes
+     */
+public function store(Request $request, int $productId)
+{
+    try {
         $product = Product::findOrFail($productId);
 
         $request->validate([
             'images' => 'required|array|min:1|max:10',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
         ], [
             'images.required' => 'Debe seleccionar al menos una imagen.',
             'images.*.image' => 'El archivo debe ser una imagen.',
-            'images.*.mimes' => 'La imagen debe ser: jpeg, png, jpg, gif o webp.',
+            'images.*.mimes' => 'La imagen debe ser: jpeg, png, jpg o gif.',
             'images.*.max' => 'La imagen no debe superar los 5MB.',
         ]);
 
+        $folderBase = 'productos/' . $productId;
         $uploaded = [];
         $isFirstImage = $product->images()->count() === 0;
 
         foreach ($request->file('images') as $index => $image) {
-            // Guardar en storage/app/public/productos/{id}
-            $path = $image->store('productos/' . $productId, 'public');
 
+            $img = Image::make($image);
+            $width = $img->width();
+            $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+
+            // Determinar carpeta según ancho
+            if ($width >= 1600) {
+                $sizeFolder = 'large';
+            } elseif ($width >= 800) {
+                $sizeFolder = 'medium';
+            } else {
+                $sizeFolder = 'small';
+            }
+
+            // Ruta donde se guardará la imagen principal
+            $path = $folderBase . '/' . $sizeFolder . '/' . $originalName . '.webp';
+
+            // Guardar imagen en WebP
+            Storage::disk('public')->put($path, (string) $img->encode('webp', 90));
+
+            // Crear thumbnail pequeño si es necesario
+            if ($sizeFolder !== 'small') {
+                $thumbPath = $folderBase . '/small/' . $originalName . '.webp';
+                $thumb = $img->resize(400, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })->encode('webp', 80);
+                Storage::disk('public')->put($thumbPath, (string) $thumb);
+            }
+
+            // Guardar en BD
             $productImage = ProductImage::create([
                 'product_id' => $productId,
-                'image_path' => $path, // Esto guarda: "productos/23/imagen.jpg"
+                'image_path' => $path,
                 'original_name' => $image->getClientOriginalName(),
                 'is_primary' => $isFirstImage && $index === 0,
                 'order' => $product->images()->count() + $index,
@@ -40,9 +76,10 @@ class ProductImageController extends Controller
 
             $uploaded[] = [
                 'id' => $productImage->id,
-                'image_path' => $productImage->image_path, // Enviar image_path
+                'image_path' => $productImage->image_path,
                 'original_name' => $productImage->original_name,
                 'is_primary' => $productImage->is_primary,
+                'order' => $productImage->order,
             ];
         }
 
@@ -50,65 +87,163 @@ class ProductImageController extends Controller
             'success' => 'Imágenes subidas correctamente.',
             'uploaded' => $uploaded,
         ]);
-    }
 
+    } catch (\Exception $e) {
+        Log::error('Error subiendo imágenes: ' . $e->getMessage());
+        return back()->withErrors(['error' => 'Error al subir imágenes: ' . $e->getMessage()]);
+    }
+}
+
+    /**
+     * Establecer imagen como principal
+     */
     public function setPrimary(int $productId, int $imageId)
     {
-        $product = Product::findOrFail($productId);
-        
-        $product->images()->update(['is_primary' => false]);
-        
-        $image = ProductImage::where('product_id', $productId)
-            ->where('id', $imageId)
-            ->firstOrFail();
-        
-        $image->update(['is_primary' => true]);
+        try {
+            $product = Product::findOrFail($productId);
 
-        return back()->with('success', 'Imagen principal actualizada.');
+            // Verificar que la imagen existe y pertenece al producto
+            $image = ProductImage::where('product_id', $productId)
+                ->where('id', $imageId)
+                ->firstOrFail();
+
+            // Remover el flag de principal de todas las imágenes del producto
+            ProductImage::where('product_id', $productId)
+                ->update(['is_primary' => false]);
+
+            // Establecer la nueva imagen principal
+            $image->update(['is_primary' => true]);
+
+            Log::info("Imagen {$imageId} establecida como principal para producto {$productId}");
+
+            return back()->with('success', 'Imagen principal actualizada correctamente.');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Imagen o producto no encontrado: {$e->getMessage()}");
+            return back()->withErrors(['error' => 'Imagen no encontrada.']);
+        } catch (\Exception $e) {
+            Log::error('Error estableciendo imagen principal: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Error al actualizar imagen principal.']);
+        }
     }
 
+    /**
+     * Agregar imagen desde URL externa (para demo en Railway)
+     */
+    public function storeFromUrl(Request $request, int $productId)
+    {
+        try {
+            $product = Product::findOrFail($productId);
+
+            $request->validate([
+                'url' => 'required|url',
+                'is_primary' => 'nullable|boolean',
+            ]);
+
+            $isPrimary = $request->get('is_primary', false);
+            $isFirstImage = $product->images()->count() === 0;
+
+            $productImage = ProductImage::create([
+                'product_id' => $productId,
+                'image_path' => $request->url,
+                'original_name' => 'imagen_externa_' . time(),
+                'is_primary' => $isPrimary || ($isFirstImage),
+                'order' => $product->images()->count(),
+            ]);
+
+            return back()->with([
+                'success' => 'Imagen externa agregada correctamente.',
+                'uploaded' => [[
+                    'id' => $productImage->id,
+                    'image_path' => $productImage->image_path,
+                    'is_primary' => $productImage->is_primary,
+                ]],
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error agregando imagen externa: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Error al agregar imagen externa: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Eliminar imagen
+     */
     public function destroy(int $productId, int $imageId)
     {
-        $image = ProductImage::where('product_id', $productId)
-            ->where('id', $imageId)
-            ->firstOrFail();
+        try {
+            // Verificar que la imagen existe y pertenece al producto
+            $image = ProductImage::where('product_id', $productId)
+                ->where('id', $imageId)
+                ->firstOrFail();
 
-        $wasPrimary = $image->is_primary;
-        
-        // Eliminar archivo físico
-        if (Storage::disk('public')->exists($image->image_path)) {
-            Storage::disk('public')->delete($image->image_path);
-        }
-        
-        $image->delete();
+            $wasPrimary = $image->is_primary;
+            $imagePath = $image->image_path;
 
-        if ($wasPrimary) {
-            $newPrimary = ProductImage::where('product_id', $productId)
-                ->orderBy('order')
-                ->first();
-            
-            if ($newPrimary) {
-                $newPrimary->update(['is_primary' => true]);
+            // Solo eliminar archivo físico si NO es una URL externa
+            if (!str_starts_with($imagePath, 'http')) {
+                if (Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                    Log::info("Archivo eliminado: {$imagePath}");
+                } else {
+                    Log::warning("Archivo no encontrado: {$imagePath}");
+                }
+            } else {
+                Log::info("Imagen externa no se elimina (URL): {$imagePath}");
             }
-        }
 
-        return back()->with('success', 'Imagen eliminada correctamente.');
+            // Eliminar registro de la base de datos
+            $image->delete();
+            Log::info("Imagen {$imageId} eliminada de producto {$productId}");
+
+            // Si era la imagen principal, asignar otra
+            if ($wasPrimary) {
+                $newPrimary = ProductImage::where('product_id', $productId)
+                    ->orderBy('order')
+                    ->first();
+
+                if ($newPrimary) {
+                    $newPrimary->update(['is_primary' => true]);
+                    Log::info("Nueva imagen principal: {$newPrimary->id}");
+                }
+            }
+
+            return back()->with('success', 'Imagen eliminada correctamente.');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error("Imagen no encontrada: {$e->getMessage()}");
+            return back()->withErrors(['error' => 'Imagen no encontrada.']);
+        } catch (\Exception $e) {
+            Log::error('Error eliminando imagen: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Error al eliminar imagen: ' . $e->getMessage()]);
+        }
     }
 
+    /**
+     * Reordenar imágenes
+     */
     public function reorder(Request $request, int $productId)
     {
-        $request->validate([
-            'images' => 'required|array',
-            'images.*.id' => 'required|exists:product_images,id',
-            'images.*.order' => 'required|integer',
-        ]);
+        try {
+            $request->validate([
+                'images' => 'required|array',
+                'images.*.id' => 'required|exists:product_images,id',
+                'images.*.order' => 'required|integer',
+            ]);
 
-        foreach ($request->images as $imageData) {
-            ProductImage::where('id', $imageData['id'])
-                ->where('product_id', $productId)
-                ->update(['order' => $imageData['order']]);
+            foreach ($request->images as $imageData) {
+                ProductImage::where('id', $imageData['id'])
+                    ->where('product_id', $productId)
+                    ->update(['order' => $imageData['order']]);
+            }
+
+            Log::info("Orden actualizado para producto {$productId}");
+
+            return back()->with('success', 'Orden actualizado correctamente.');
+
+        } catch (\Exception $e) {
+            Log::error('Error reordenando imágenes: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Error al reordenar imágenes.']);
         }
-
-        return back()->with('success', 'Orden actualizado correctamente.');
     }
 }

@@ -75,7 +75,14 @@ const sortedImages = computed(() => {
     });
 });
 
-const getImageUrl = (imagePath: string) => `/storage/${imagePath}`;
+const getImageUrl = (imagePath: string) => {
+    // Si es una URL externa (http/https), devolverla tal cual
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+    }
+    // Si es un path local, usar storage
+    return `/storage/${imagePath}`;
+};
 
 const nextImage = () => {
     if (!sortedImages.value.length) return;

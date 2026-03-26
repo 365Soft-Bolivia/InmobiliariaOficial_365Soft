@@ -3,17 +3,15 @@
 namespace App\Models;
 
 use App\Traits\HasCompany;
-use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Models\Role as SpatieRole;
 
-class Role extends Model
+class Role extends SpatieRole
 {
     use HasCompany;
 
-    protected $fillable = ['name', 'display_name', 'description'];
+    // Spatie ya maneja todo, solo agregamos el trait HasCompany
+    // Los campos fillable ya están definidos en Spatie Role
+    protected $fillable = ['name', 'guard_name', 'is_default'];
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'role_user', 'role_id', 'user_id');
-    }
-
+    // Ya no necesitamos la función users() porque Spatie la maneja automáticamente
 }

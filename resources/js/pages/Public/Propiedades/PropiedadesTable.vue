@@ -8,6 +8,7 @@ import Pagination from '@/components/public/Pagination.vue';
 import publicRoutes from '@/routes/public';
 import { Heart } from 'lucide-vue-next';
 
+
 interface ProductImage {
     id: number;
     image_path: string;
@@ -77,8 +78,13 @@ const getSortedImages = (propiedad: Product) => {
     });
 };
 
-// Helper para obtener URL de imagen
+// Helper para obtener URL de imagen (soporta URLs externas)
 const getImageUrl = (imagePath: string) => {
+    // Si es una URL externa (http/https), devolverla tal cual
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return imagePath;
+    }
+    // Si es un path local, usar storage
     return `/storage/${imagePath}`;
 };
 
@@ -127,6 +133,7 @@ const total = computed(() => props.pagination?.total || 0);
                             :src="getImageUrl(getSortedImages(propiedad)[currentImageIndexes[propiedad.id] || 0]?.image_path)"
                             :alt="getSortedImages(propiedad)[currentImageIndexes[propiedad.id] || 0]?.original_name"
                             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading="lazy"
                         />
 
                         <!-- Badge de imagen principal -->
@@ -172,10 +179,11 @@ const total = computed(() => props.pagination?.total || 0);
                     </div>
 
                     <!-- Miniaturas (thumbnails) -->
-                    <div v-if="getSortedImages(propiedad).length > 1" class="px-2 py-2 bg-gray-50 dark:bg-gray-900">
+                    <!-- <div v-if="getSortedImages(propiedad).length > 1" class="px-2 py-2 bg-gray-50 dark:bg-gray-900">
                         <div class="flex gap-1 overflow-x-auto">
                             <button
                                 v-for="(image, index) in getSortedImages(propiedad)"
+                                v-show="index === (currentImageIndexes[propiedad.id] || 0)"
                                 :key="image.id"
                                 @click="goToImage(propiedad.id, index)"
                                 :class="[
@@ -185,14 +193,16 @@ const total = computed(() => props.pagination?.total || 0);
                                         : 'border-transparent opacity-60 hover:opacity-100'
                                 ]"
                             >
-                                <img
-                                    :src="getImageUrl(image.image_path)"
-                                    :alt="`Thumbnail ${index + 1}`"
-                                    class="w-full h-full object-cover"
-                                />
+                        <img
+                            v-if="(currentImageIndexes[propiedad.id] || 0) === index || false" 
+                            :src="getImageUrl(image.image_path)"
+                            :alt="`Thumbnail ${index + 1}`"
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                        />
                             </button>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Información de la propiedad -->
@@ -336,10 +346,10 @@ const total = computed(() => props.pagination?.total || 0);
                                     @click="handleFavorite(propiedad.id)"
                                     class="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-700 rounded-full p-2 transition-all shadow-lg"
                                 >
-                                    <Heart
+                                    <!-- <Heart
                                         :size="16"
                                         :class="favoriteProperties.has(propiedad.id) ? 'fill-red-500 text-red-500' : ''"
-                                    />
+                                    /> -->
                                 </button>
                             </div>
 
@@ -353,7 +363,7 @@ const total = computed(() => props.pagination?.total || 0);
                         </div>
 
                         <!-- Miniaturas (thumbnails) -->
-                        <div v-if="getSortedImages(propiedad).length > 1" class="px-2 py-2 bg-gray-50 dark:bg-gray-900">
+                        <!-- <div v-if="getSortedImages(propiedad).length > 1" class="px-2 py-2 bg-gray-50 dark:bg-gray-900">
                             <div class="flex gap-1 overflow-x-auto">
                                 <button
                                     v-for="(image, index) in getSortedImages(propiedad)"
@@ -366,14 +376,16 @@ const total = computed(() => props.pagination?.total || 0);
                                             : 'border-transparent opacity-60 hover:opacity-100'
                                     ]"
                                 >
-                                    <img
-                                        :src="getImageUrl(image.image_path)"
-                                        :alt="`Thumbnail ${index + 1}`"
-                                        class="w-full h-full object-cover"
-                                    />
+                                <img
+                                    v-if="(currentImageIndexes[propiedad.id] || 0) === index || false" 
+                                    :src="getImageUrl(image.image_path)"
+                                    :alt="`Thumbnail ${index + 1}`"
+                                    class="w-full h-full object-cover"
+                                    loading="lazy"
+                                />
                                 </button>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- Información detallada -->

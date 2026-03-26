@@ -15,7 +15,8 @@ import {
     PinInputSlot,
 } from '@/components/ui/pin-input';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
-import { confirm } from '@/routes/two-factor';
+import twoFactor from '@/routes/admin/two-factor';
+// import { confirm } from '@/routes/two-factor'; // TODO: Ruta no implementada
 import { Form } from '@inertiajs/vue3';
 import { useClipboard } from '@vueuse/core';
 import { Check, Copy, Loader2, ScanLine } from 'lucide-vue-next';
@@ -230,8 +231,9 @@ watch(
                 </template>
 
                 <template v-else>
+                    <!-- TODO: Formulario de confirmación 2FA no implementado - falta ruta confirm -->
                     <Form
-                        v-bind="confirm.form()"
+                        v-bind="twoFactor.show.form()"
                         reset-on-error
                         @finish="code = []"
                         @success="isOpen = false"

@@ -22,10 +22,10 @@ const sidebarNavItems: NavItem[] = [
         title: 'Contraseña',
         href: editPassword(),
     },
-    {
-        title: 'Autenticación de dos pasos',
-        href: showTwoFactor(),
-    },
+    // {
+    //     title: 'Autenticación de dos pasos',
+    //     href: showTwoFactor(),
+    // },
     {
         title: 'Apariencia',
         href: editAppearance(),

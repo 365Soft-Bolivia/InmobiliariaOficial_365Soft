@@ -1,4 +1,4 @@
-import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
+import twoFactor from '@/routes/admin/two-factor';
 import { computed, ref } from 'vue';
 
 const fetchJson = async <T>(url: string): Promise<T> => {
@@ -23,13 +23,18 @@ const hasSetupData = computed<boolean>(
 );
 
 export const useTwoFactorAuth = () => {
+    // Nota: Las rutas qrCode, recoveryCodes y secretKey no están definidas
+    // en el proyecto actual. Estas funciones se dejan como placeholders
+    // para futura implementación.
+
     const fetchQrCode = async (): Promise<void> => {
         try {
-            const { svg } = await fetchJson<{ svg: string; url: string }>(
-                qrCode.url(),
-            );
-
-            qrCodeSvg.value = svg;
+            // TODO: Implementar cuando la ruta esté disponible
+            // const { svg } = await fetchJson<{ svg: string; url: string }>(
+            //     qrCode.url(),
+            // );
+            // qrCodeSvg.value = svg;
+            console.warn('fetchQrCode: ruta no implementada');
         } catch {
             errors.value.push('Failed to fetch QR code');
             qrCodeSvg.value = null;
@@ -38,11 +43,12 @@ export const useTwoFactorAuth = () => {
 
     const fetchSetupKey = async (): Promise<void> => {
         try {
-            const { secretKey: key } = await fetchJson<{ secretKey: string }>(
-                secretKey.url(),
-            );
-
-            manualSetupKey.value = key;
+            // TODO: Implementar cuando la ruta esté disponible
+            // const { secretKey: key } = await fetchJson<{ secretKey: string }>(
+            //     secretKey.url(),
+            // );
+            // manualSetupKey.value = key;
+            console.warn('fetchSetupKey: ruta no implementada');
         } catch {
             errors.value.push('Failed to fetch a setup key');
             manualSetupKey.value = null;
@@ -67,10 +73,12 @@ export const useTwoFactorAuth = () => {
 
     const fetchRecoveryCodes = async (): Promise<void> => {
         try {
-            clearErrors();
-            recoveryCodesList.value = await fetchJson<string[]>(
-                recoveryCodes.url(),
-            );
+            // TODO: Implementar cuando la ruta esté disponible
+            // clearErrors();
+            // recoveryCodesList.value = await fetchJson<string[]>(
+            //     recoveryCodes.url(),
+            // );
+            console.warn('fetchRecoveryCodes: ruta no implementada');
         } catch {
             errors.value.push('Failed to fetch recovery codes');
             recoveryCodesList.value = [];
@@ -88,6 +96,7 @@ export const useTwoFactorAuth = () => {
     };
 
     return {
+        twoFactor,
         qrCodeSvg,
         manualSetupKey,
         recoveryCodesList,
