@@ -97,6 +97,7 @@ networks:
     driver: bridge
   npm_network:
     external: true
+    name: nginx-proxy_npm_network
 
 volumes:
   mysql_data:
