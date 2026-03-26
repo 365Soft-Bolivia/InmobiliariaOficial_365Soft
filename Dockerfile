@@ -98,7 +98,8 @@ server {
 EOF
 
 # Configuración Supervisor (inline)
-RUN cat > /etc/supervisor/conf.d/supervisord.conf << 'EOF'
+RUN mkdir -p /etc/supervisor/conf.d \
+    && cat > /etc/supervisor/conf.d/supervisord.conf << 'EOF'
 [supervisord]
 nodaemon=true
 user=root
