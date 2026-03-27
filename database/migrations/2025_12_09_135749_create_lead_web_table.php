@@ -20,19 +20,19 @@ class CreateLeadWebTable extends Migration
             // Solo created_at (sin updated_at)
             $table->timestamp('created_at')->useCurrent();
 
-            // FK constraint
-            $table->foreign('lead_id')
-                ->references('id')
-                ->on('leads')
-                ->onDelete('cascade');
+            // FK constraint comentada - la tabla leads se crea al importar el SQL
+            // $table->foreign('lead_id')
+            //     ->references('id')
+            //     ->on('leads')
+            //     ->onDelete('cascade');
         });
     }
 
     public function down()
     {
-        Schema::table('lead_web', function (Blueprint $table) {
-            $table->dropForeign(['lead_id']);
-        });
+        // Schema::table('lead_web', function (Blueprint $table) {
+        //     $table->dropForeign(['lead_id']);
+        // });
 
         Schema::dropIfExists('lead_web');
     }

@@ -9,6 +9,11 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+// Ruta simple para compatibilidad con middlewares de Laravel
+Route::get('login', function() {
+    return redirect()->route('admin.login');
+})->name('login');
+
 Route::middleware('guest')
     ->prefix('admin')
     ->group(function () {
@@ -29,7 +34,7 @@ Route::middleware('auth')
     ->prefix('admin')
     ->group(function () {
         Route::get('verify-email', EmailVerificationPromptController::class)->name('admin.verification.notice');
-        
+
         Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
             ->middleware(['signed', 'throttle:6,1'])
             ->name('admin.verification.verify');

@@ -7,19 +7,19 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'verified', 'role:admin'])
     ->prefix('admin')
     ->group(function () {
-        // Ruta principal de lista
-        Route::get('accesos', [AccesosController::class, 'index'])
-            ->name('admin.accesos');
-
-        // Rutas API agrupadas
+        // Rutas de accesos
         Route::prefix('accesos')
-            ->name('admin.accesos.')
             ->group(function () {
-                Route::get('/listar', [AccesosController::class, 'listar'])->name('listar');
-                Route::post('/{id}/toggle-status', [AccesosController::class, 'toggleStatus'])->name('toggle-status');
-                Route::post('/', [AccesosController::class, 'store'])->name('store');
-                Route::put('/{id}', [AccesosController::class, 'update'])->name('update');
-                Route::delete('/{id}', [AccesosController::class, 'destroy'])->name('destroy');
+                // Ruta principal de lista (GET /admin/accesos)
+                Route::get('/', [AccesosController::class, 'index'])
+                    ->name('admin.accesos');
+
+                // Rutas API con prefijo admin.accesos.
+                Route::get('/listar', [AccesosController::class, 'listar'])->name('admin.accesos.listar');
+                Route::post('/', [AccesosController::class, 'store'])->name('admin.accesos.store');
+                Route::put('/{id}', [AccesosController::class, 'update'])->name('admin.accesos.update');
+                Route::delete('/{id}', [AccesosController::class, 'destroy'])->name('admin.accesos.destroy');
+                Route::post('/{id}/toggle-status', [AccesosController::class, 'toggleStatus'])->name('admin.accesos.toggle-status');
             });
     });
 

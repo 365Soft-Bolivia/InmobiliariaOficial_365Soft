@@ -8,7 +8,7 @@ import { Search, X, Settings } from 'lucide-vue-next';
 import AccesosCreateForm from './AccesosCreateForm.vue';
 import { admin } from '@/routes-custom';
 
-const { accesos, roles } = admin;
+const { accesos, roles: rolesRoute } = admin; // Renombrado para evitar conflicto con props
 
 interface Role {
   id: number;
@@ -90,7 +90,7 @@ const handleCreate = () => {
 
 // Navegar a gestión de roles
 const goToRoles = () => {
-  router.visit(roles().url);
+  router.visit(rolesRoute().url);
 };
 </script>
 

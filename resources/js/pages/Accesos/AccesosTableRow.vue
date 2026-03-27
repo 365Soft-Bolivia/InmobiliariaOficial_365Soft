@@ -44,8 +44,8 @@ const getRoleBadgeVariant = (roleName: string) => {
 const handleToggleStatus = () => {
   // Usa route() helper o construye la ruta correctamente
   router.post(
-    `/accesos/${props.usuario.id}/toggle-status`, 
-    {}, 
+    `/admin/accesos/${props.usuario.id}/toggle-status`,
+    {},
     {
       preserveScroll: true,
       preserveState: true,
@@ -58,10 +58,10 @@ const handleToggleStatus = () => {
       },
       onError: (errors) => {
         console.error('Error al cambiar estado:', errors);
-        
+
         // ✅ Mostrar el mensaje de error del servidor si existe
         const errorMessage = errors.message || 'No se pudo cambiar el estado del usuario.';
-        
+
         showError('Error al cambiar estado', errorMessage);
       }
     }
@@ -69,7 +69,7 @@ const handleToggleStatus = () => {
 };
 
 const handleDelete = () => {
-  router.delete(`/accesos/${props.usuario.id}`, {
+  router.delete(`/admin/accesos/${props.usuario.id}`, {
     preserveScroll: true,
     preserveState: true,
     only: ['usuarios'],

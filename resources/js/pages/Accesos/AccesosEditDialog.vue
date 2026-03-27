@@ -39,7 +39,7 @@ const form = useForm({
 });
 
 const handleSubmit = () => {
-  form.put(`/accesos/${props.usuario.id}`, {
+  form.put(`/admin/accesos/${props.usuario.id}`, {
     onSuccess: () => {
       emit('update:open', false);
       showSuccess(

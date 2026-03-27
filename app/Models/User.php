@@ -225,7 +225,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     use Notifiable,
     // EntrustUserTrait,
      Authenticatable, Authorizable, CanResetPassword, HasFactory, TwoFactorAuthenticatable;
-    use HasCompany;
+    // use HasCompany; // Comentado: tabla companies no existe en este sistema
     use HasMaskImage;
     use HasRoles; // Spatie Permission trait
     // use UseDevices;
@@ -260,7 +260,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     'email',
     'password',
     'status',
-    'company_id',
+    // 'company_id', // Comentado: tabla companies no existe en este sistema
     'dark_theme',
     'rtl',
     'email_notifications',

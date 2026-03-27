@@ -65,7 +65,7 @@ const handleEdit = () => {
 
 const handleToggleStatus = (role: Role) => {
   router.post(
-    `/roles/${role.id}/toggle-status`,
+    `/admin/roles/${role.id}/toggle-status`,
     {},
     {
       preserveScroll: true,
@@ -86,7 +86,7 @@ const handleToggleStatus = (role: Role) => {
 const handleDelete = () => {
   if (!selectedRole.value) return;
 
-  router.delete(`/roles/${selectedRole.value.id}`, {
+  router.delete(`/admin/roles/${selectedRole.value.id}`, {
     preserveScroll: true,
     onSuccess: (page) => {
       const message = page.props.flash?.success;

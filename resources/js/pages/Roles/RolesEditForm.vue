@@ -44,28 +44,28 @@ watch(() => props.role, (newRole) => {
 
 const handleSubmit = () => {
   if (isSubmitting.value) return;
-  
+
   isSubmitting.value = true;
-  
-  form.put(`/roles/${props.role.id}`, {
+
+  form.put(`/admin/roles/${props.role.id}`, {
     preserveScroll: true,
     onSuccess: (page) => {
       const message = page.props.flash?.success || 'Rol actualizado correctamente';
-      toast.add({ 
-        severity: 'success', 
-        summary: 'Éxito', 
+      toast.add({
+        severity: 'success',
+        summary: 'Éxito',
         detail: message,
-        life: 3000 
+        life: 3000
       });
       emit('save');
     },
     onError: (errors) => {
       const firstError = Object.values(errors)[0] as string;
-      toast.add({ 
-        severity: 'error', 
-        summary: 'Error', 
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
         detail: firstError || 'Error al actualizar el rol',
-        life: 3000 
+        life: 3000
       });
     },
     onFinish: () => {

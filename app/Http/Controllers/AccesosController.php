@@ -11,6 +11,11 @@ use Inertia\Inertia;
 
 class AccesosController extends Controller
 {
+    public function __construct()
+    {
+        \Log::info('🔔 AccesosController instanciado');
+    }
+
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -22,7 +27,7 @@ class AccesosController extends Controller
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
                         ->orWhereHas('roles', function ($roleQuery) use ($search) {
-                            $roleQuery->where('display_name', 'like', "%{$search}%");
+                            $roleQuery->where('name', 'like', "%{$search}%");
                         });
                 });
             })
@@ -37,26 +42,27 @@ class AccesosController extends Controller
                     'estado' => $user->status === 'active' ? 1 : 0,
                     'role' => $user->roles->first() ? [
                         'id' => $user->roles->first()->id,
-                        'nombre' => $user->roles->first()->display_name,
-                        'descripcion' => $user->roles->first()->description,
+                        'nombre' => $user->roles->first()->name,
+                        'name' => $user->roles->first()->name,
+                        // 'descripcion' => $user->roles->first()->description, // Comentado: campo no existe en tabla roles
                     ] : null,
                     'roles' => $user->roles->map(function ($role) {
                         return [
                             'id' => $role->id,
                             'name' => $role->name,
-                            'display_name' => $role->display_name,
+                            // 'display_name' => $role->display_name, // Comentado: campo no existe en tabla roles
                         ];
                     }),
                     'created_at' => $user->created_at ? $user->created_at->format('Y-m-d H:i:s') : null,
                 ];
             });
 
-        $roles = Role::orderBy('display_name')->get()->map(function ($role) {
+        $roles = Role::orderBy('name')->get()->map(function ($role) {
             return [
                 'id' => $role->id,
-                'nombre' => $role->display_name,
+                'nombre' => $role->name,
                 'name' => $role->name,
-                'descripcion' => $role->description,
+                // 'descripcion' => $role->description, // Comentado: campo no existe en tabla roles
             ];
         });
 
@@ -71,39 +77,51 @@ class AccesosController extends Controller
 
   public function store(Request $request)
 {
+    \Log::info('===== MÉTODO STORE EJECUTÁNDOSE =====');
+    \Log::info('Datos completos del request:', $request->all());
+    \Log::info('Archivos en request:', $request->allFiles());
+
+    \Log::info(' Datos recibidos para crear usuario:', $request->all());
+
+    // La validación se maneja automáticamente por Laravel
+    // Si falla, Laravel lanza una ValidationException que Inertia detecta automáticamente
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        'role_id' => ['required', 'exists:roles,id'],
+        // 'company_id' => ['nullable', 'integer', 'exists:companies,id'], // Comentado: tabla companies no existe
+        'gender' => ['nullable', 'in:male,female,other'],
+    ]);
+
+    \Log::info('✅ Validación exitosa:', $validated);
+
     try {
-        \Log::info(' Datos recibidos para crear usuario:', $request->all());
-
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role_id' => ['required', 'exists:roles,id'],
-            'company_id' => ['nullable', 'integer', 'exists:companies,id'],
-            'gender' => ['nullable', 'in:male,female,other'],
-        ]);
-
-        \Log::info(' Validación exitosa:', $validated);
-
         $user = new User();
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->password = Hash::make($validated['password']);
         $user->status = 'active';
-        $user->company_id = $validated['company_id'] ?? 1;
+        // $user->company_id = $validated['company_id'] ?? 1; // Comentado: tabla companies no existe
         $user->dark_theme = 0;
         $user->rtl = 0;
         $user->email_notifications = 1;
         $user->gender = $validated['gender'] ?? 'male';
         $user->locale = 'es';
-        $user->login = 'enable';
+        // Usar un valor único basado en el email para evitar duplicados en el campo login
+        $user->login = 'enable_' . md5($validated['email'] . time());
+
+        \Log::info('💾 Intentando guardar usuario...', ['name' => $user->name, 'email' => $user->email]);
+
         $user->save();
 
-        \Log::info('Usuario creado con ID: ' . $user->id);
+        \Log::info('✅ Usuario creado con ID: ' . $user->id);
 
         $user->roles()->attach($validated['role_id']);
 
-        \Log::info('Rol asignado correctamente');
+        \Log::info('✅ Rol asignado correctamente');
+
+        \Log::info('🔄 Redirigiendo a admin.accesos con éxito...');
 
         return redirect()->route('admin.accesos')->with('success', 'Usuario creado correctamente.');
 
@@ -115,8 +133,9 @@ class AccesosController extends Controller
             'file' => $e->getFile(),
         ]);
 
-        return back()->with('error', 'Error al crear el usuario: ' . $e->getMessage())
-                     ->withInput();
+        // Redirigir con el mensaje de error
+        return redirect()->route('admin.accesos')
+            ->with('error', 'Error al crear el usuario: ' . $e->getMessage());
     }
 }
 
@@ -132,14 +151,14 @@ class AccesosController extends Controller
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
                 'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
                 'role_id' => ['required', 'exists:roles,id'],
-                'company_id' => ['nullable', 'integer', 'exists:companies,id'],
+                // 'company_id' => ['nullable', 'integer', 'exists:companies,id'], // Comentado: tabla companies no existe
                 'gender' => ['nullable', 'in:male,female,other'],
                 'status' => ['nullable', 'in:active,deactive'], // Validación corregida
             ]);
 
             $user->name = $validated['name'];
             $user->email = $validated['email'];
-            $user->company_id = $validated['company_id'] ?? $user->company_id;
+            // $user->company_id = $validated['company_id'] ?? $user->company_id; // Comentado: tabla companies no existe
             $user->gender = $validated['gender'] ?? $user->gender;
             $user->status = $validated['status'] ?? $user->status;
 

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNotification } from '@/composables/useNotification';
+import { admin } from '@/routes-custom';
 
 interface Role {
   id: number;
@@ -11,7 +12,7 @@ interface Role {
   descripcion?: string;
 }
 
-defineProps<{
+const props = defineProps<{
   roles: Role[];
 }>();
 
@@ -28,8 +29,21 @@ const form = useForm({
 });
 
 const handleSubmit = () => {
-  form.post('/accesos', {
-    onSuccess: () => {
+  console.log('=== ENVIANDO FORMULARIO ===');
+  console.log('URL:', admin.accesos.store.url());
+  console.log('Datos del formulario:', form.data());
+  console.log('Formulario válido:', !form.hasErrors);
+
+  form.post(admin.accesos.store.url(), {
+    onBefore: () => {
+      console.log('🔵 ANTES de enviar la petición');
+    },
+    onStart: () => {
+      console.log('🚀 Iniciando petición...');
+    },
+    onSuccess: (page) => {
+      console.log('=== USUARIO CREADO EXITOSAMENTE ===');
+      console.log('Respuesta de la página:', page);
       emit('save');
       showSuccess(
         'Usuario creado',
@@ -38,11 +52,15 @@ const handleSubmit = () => {
       form.reset();
     },
     onError: (errors) => {
-      console.error('Errores de validación:', errors);
+      console.error('=== ERRORES DE VALIDACIÓN ===');
+      console.error('Errores:', errors);
       showError(
         'Error al crear usuario',
         'Por favor, verifica los datos ingresados e intenta nuevamente.'
       );
+    },
+    onFinish: () => {
+      console.log('⚪ Petición finalizada');
     }
   });
 };

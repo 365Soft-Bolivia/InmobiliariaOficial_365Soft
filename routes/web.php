@@ -5,6 +5,12 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Controllers\Public\HomeController;
 
+// Ruta de prueba POST
+Route::post('/test-post', function () {
+    \Log::info('✅ RUTA DE PRUEBA POST EJECUTADA');
+    return response()->json(['success' => true, 'message' => 'POST funciona']);
+});
+
 // Rutas públicas
 Route::get('/', [HomeController::class, 'index'])->name('home');
 

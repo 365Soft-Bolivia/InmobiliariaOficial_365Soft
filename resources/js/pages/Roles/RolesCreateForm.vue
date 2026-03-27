@@ -25,10 +25,10 @@ const isSubmitting = ref(false);
 
 const handleSubmit = () => {
   if (isSubmitting.value) return;
-  
+
   isSubmitting.value = true;
-  
-  form.post('/roles', {
+
+  form.post('/admin/roles', {
     preserveScroll: true,
     onSuccess: (page) => {
       const message = page.props.flash?.success || 'Rol creado correctamente';
