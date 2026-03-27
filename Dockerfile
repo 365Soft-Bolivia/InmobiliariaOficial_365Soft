@@ -22,9 +22,11 @@ FROM php:8.3-fpm-alpine AS production
 
 # Dependencias del sistema
 RUN apk add --no-cache \
+    autoconf \
     bash \
     curl \
     freetype-dev \
+    g++ \
     gettext-dev \
     git \
     icu-dev \
@@ -33,6 +35,7 @@ RUN apk add --no-cache \
     libwebp-dev \
     libxml2-dev \
     libzip-dev \
+    make \
     mysql-client \
     oniguruma-dev \
     shadow \
