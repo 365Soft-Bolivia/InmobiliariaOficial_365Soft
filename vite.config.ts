@@ -12,9 +12,9 @@ export default defineConfig({
             refresh: true,
         }),
         tailwindcss(),
-        wayfinder({
-            formVariants: true,
-        }),
+        // En Docker build no hay PHP disponible en la etapa de Node,
+        // wayfinder:generate se salta y usa los tipos ya generados en el repo.
+        ...(process.env.DOCKER_BUILD ? [] : [wayfinder({ formVariants: true })]),
         vue({
             template: {
                 transformAssetUrls: {

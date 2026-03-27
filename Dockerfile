@@ -9,6 +9,10 @@ COPY package*.json ./
 RUN npm ci --frozen-lockfile
 
 COPY . .
+
+# DOCKER_BUILD=1 le indica a vite.config.ts que omita wayfinder:generate
+# (requiere PHP que no existe en esta etapa)
+ENV DOCKER_BUILD=1
 RUN npm run build
 
 # ================================================================

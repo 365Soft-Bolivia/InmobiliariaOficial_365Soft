@@ -17,7 +17,6 @@ node_modules
 vendor
 npm-debug.log
 yarn-error.log
-package-lock.json
 
 # ── Archivos de entorno ───────────────────────────────────────
 .env
