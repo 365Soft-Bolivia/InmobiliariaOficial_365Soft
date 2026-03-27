@@ -32,10 +32,12 @@ done
 
 echo "✓  Base de datos disponible."
 
-# ── Generar APP_KEY si no existe ──────────────────────────────
+# ── Validar APP_KEY ───────────────────────────────────────────
 if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "base64:CHANGE_ME" ]; then
-    echo "⚙  Generando APP_KEY..."
-    php artisan key:generate --ansi --force
+    echo "✗  APP_KEY no está configurado en el .env. Deteniendo."
+    echo "   Genera uno con: php artisan key:generate --show"
+    echo "   Y agrégalo al .env: APP_KEY=base64:..."
+    exit 1
 fi
 
 # ── Migraciones ───────────────────────────────────────────────
