@@ -108,6 +108,6 @@ networks:
     driver: bridge
 
   # Red compartida con Nginx Proxy Manager (ya existe en el VPS)
+  # El nombre físico de la red en el host es 'proxy_network'
   proxy_network:
     external: true
-    name: geopricer_365soft_app-network

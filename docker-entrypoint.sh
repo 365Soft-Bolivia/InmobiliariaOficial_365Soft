@@ -44,6 +44,38 @@ fi
 echo "⚙  Ejecutando migraciones..."
 php artisan migrate --force
 
+# ── Seeders (solo primera vez, si la BD está vacía) ───────────
+# Evita re-sembrar en cada reinicio y duplicar datos en producción.
+# Si la tabla users ya tiene registros, se omite el seed.
+# Usa PDO directo porque tinker no está disponible en --no-dev.
+USERS_COUNT=$(php -r "
+    try {
+        \$pdo = new PDO(
+            'mysql:host=' . getenv('DB_HOST') . ';port=' . getenv('DB_PORT') . ';dbname=' . getenv('DB_DATABASE'),
+            getenv('DB_USERNAME'),
+            getenv('DB_PASSWORD'),
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
+        // Verificar si la tabla users existe antes de contar
+        \$stmt = \$pdo->query(\"SHOW TABLES LIKE 'users'\");
+        if (\$stmt->rowCount() === 0) {
+            echo '0';
+        } else {
+            echo (string) \$pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
+        }
+    } catch (Exception \$e) {
+        echo '0';
+    }
+" 2>/dev/null || echo "0")
+
+if [ "$USERS_COUNT" = "0" ]; then
+    echo "⚙  Base de datos vacía. Ejecutando seeders..."
+    php artisan db:seed --force
+    echo "✓  Seeders completados."
+else
+    echo "ℹ  Base de datos ya tiene datos ($USERS_COUNT usuarios). Seed omitido."
+fi
+
 # ── Storage symlink ───────────────────────────────────────────
 if [ ! -L /var/www/html/public/storage ]; then
     echo "⚙  Creando symlink de storage..."
