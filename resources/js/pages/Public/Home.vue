@@ -73,14 +73,21 @@ const searchProperties = () => {
 
 const getPropertyImage = (imagePath: string | null) => {
     if (!imagePath) {
-        // Placeholder simple con gradient - SVG más corto para evitar errores
-        return 'data:image/svg+xml,%3Csvg width="800" height="600" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="800" height="600" fill="%23ddd"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" fill="%23999"%3ESin Imagen%3C/text%3E%3C/svg%3E';
+        // Imagen genérica de placeholder - Unsplash house image
+        return 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop';
     }
     return `/storage/${imagePath}`;
 };
 
 const getOperacionLabel = (operacion: string) => {
     return props.filter_options.operaciones[operacion] || operacion;
+};
+
+const handleImageError = (event: Event) => {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+        target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop';
+    }
 };
 </script>
 
@@ -303,10 +310,10 @@ const getOperacionLabel = (operacion: string) => {
         </section>
 
         <!-- Propiedades Destacadas -->
-        <section v-if="featured_properties.length > 0" class="py-20 bg-white dark:bg-gray-900">
+        <section v-if="featured_properties.length > 0" class="py-20 bg-gray-50 dark:bg-gray-900">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                    <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                         Propiedades Destacadas
                     </h2>
                     <p class="text-xl text-gray-600 dark:text-gray-300">
@@ -321,51 +328,65 @@ const getOperacionLabel = (operacion: string) => {
                         class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all transform hover:scale-105 group"
                     >
                         <!-- Imagen -->
-                        <div class="relative h-48 overflow-hidden">
+                        <div class="relative h-56 overflow-hidden">
                             <img
                                 :src="getPropertyImage(property.imagen_principal)"
                                 :alt="property.name"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                @error="handleImageError"
                             >
-                            <div class="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            <div class="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
                                 {{ getOperacionLabel(property.operacion) }}
+                            </div>
+                            <div class="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded-lg text-xs font-medium backdrop-blur-sm">
+                                {{ property.codigo_inmueble || 'Código: N/A' }}
                             </div>
                         </div>
 
                         <!-- Contenido -->
                         <div class="p-6">
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
                                 {{ property.name }}
                             </h3>
-                            <div class="text-2xl font-bold text-blue-600 mb-4">
+
+                            <div class="flex items-center text-gray-500 dark:text-gray-400 text-sm mb-3">
+                                <MapPin class="w-4 h-4 mr-1 flex-shrink-0" />
+                                <span class="truncate">{{ property.direccion }}</span>
+                            </div>
+
+                            <div class="text-3xl font-bold text-blue-600 mb-4">
                                 {{ formatPrice(property.price) }}
                             </div>
 
                             <div class="grid grid-cols-2 gap-3 text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                <div v-if="property.ambientes" class="flex items-center">
-                                    <Home class="w-4 h-4 mr-1" />
-                                    {{ property.ambientes }} ambientes
+                                <div v-if="property.ambientes" class="flex items-center bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+                                    <Home class="w-4 h-4 mr-2 flex-shrink-0" />
+                                    <span>{{ property.ambientes }} amb.</span>
                                 </div>
-                                <div v-if="property.habitaciones" class="flex items-center">
-                                    <Home class="w-4 h-4 mr-1" />
-                                    {{ property.habitaciones }} hab.
+                                <div v-if="property.habitaciones" class="flex items-center bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+                                    <Home class="w-4 h-4 mr-2 flex-shrink-0" />
+                                    <span>{{ property.habitaciones }} hab.</span>
                                 </div>
-                                <div v-if="property.superficie_construida" class="flex items-center">
-                                    <MapPin class="w-4 h-4 mr-1" />
-                                    {{ property.superficie_construida }}m²
+                                <div v-if="property.banos" class="flex items-center bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+                                    <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h5l2 3h9v12H4V4z"/>
+                                    </svg>
+                                    <span>{{ property.banos }} baños</span>
                                 </div>
-                                <div v-if="property.direccion" class="flex items-center">
-                                    <MapPin class="w-4 h-4 mr-1" />
-                                    {{ property.direccion }}
+                                <div v-if="property.superficie_construida" class="flex items-center bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
+                                    <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+                                    </svg>
+                                    <span>{{ property.superficie_construida }}m²</span>
                                 </div>
                             </div>
 
-                            <!-- <Link
-                                :href="propiedad.show.url(property.id)"
-                                class="block w-full text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                            <Link
+                                :href="`/propiedades/${property.id}`"
+                                class="block w-full text-center bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
                             >
                                 Ver Detalles
-                            </Link> -->
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -379,6 +400,26 @@ const getOperacionLabel = (operacion: string) => {
                         <Home class="w-5 h-5 ml-2" />
                     </Link>
                 </div>
+            </div>
+        </section>
+
+        <!-- Mensaje cuando no hay propiedades -->
+        <section v-else class="py-20 bg-gray-50 dark:bg-gray-900">
+            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+                <Building class="w-24 h-24 text-gray-300 mx-auto mb-6" />
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    Próximamente Propiedades Destacadas
+                </h2>
+                <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">
+                    Estamos actualizando nuestro catálogo. Mientras tanto, explora todas nuestras propiedades disponibles.
+                </p>
+                <Link
+                    href="/propiedades"
+                    class="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg"
+                >
+                    Ver Catálogo Completo
+                    <Home class="w-5 h-5 ml-2" />
+                </Link>
             </div>
         </section>
 

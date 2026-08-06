@@ -16,25 +16,29 @@ class HomeController extends Controller
      */
     public function index(): Response
     {
-        // Obtener propiedades destacadas (públicas y con imagen)
+        // Obtener propiedades destacadas (públicas, con o sin imagen)
         $featured_properties = Product::with(['images', 'location', 'category'])
             ->where('is_public', true)
-            ->has('images') // Solo propiedades con imágenes
             ->inRandomOrder()
             ->take(6)
             ->get()
             ->map(function ($product) {
+                // Obtener imagen principal o la primera disponible
+                $imagePath = $product->images->where('is_primary', true)->first()?->image_path
+                          ?? $product->images->first()?->image_path;
+
                 return [
                     'id' => $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
+                    'name' => $product->name ?? 'Propiedad sin nombre',
+                    'price' => $product->price ?? 0,
+                    'codigo_inmueble' => $product->codigo_inmueble,
                     'operacion' => $product->operacion ?? 'venta',
                     'ambientes' => $product->ambientes,
                     'habitaciones' => $product->habitaciones,
+                    'banos' => $product->banos,
                     'superficie_construida' => $product->superficie_construida,
-                    'direccion' => $product->location?->address,
-                    'imagen_principal' => $product->images->where('is_primary', true)->first()?->image_path
-                                        ?? $product->images->first()?->image_path,
+                    'direccion' => $product->location?->address ?? 'Ubicación no disponible',
+                    'imagen_principal' => $imagePath,
                     'categoria' => $product->category?->category_name ?? 'Propiedad',
                 ];
             });
